@@ -18,6 +18,9 @@
             </intent-filter>
         </activity>
         <activity
+            android:name="com.solution.it.newsoft.LoginActivity"
+            android:parentActivityName="com.solution.it.newsoft.MainActivity" />
+        <activity
             android:name="com.solution.it.newsoft.ListingActivity"
             android:parentActivityName="com.solution.it.newsoft.MainActivity" />
     </application>

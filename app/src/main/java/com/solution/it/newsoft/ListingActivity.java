@@ -183,7 +183,7 @@ public class ListingActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.logout:
                 viewModel.getPrefs().edit().clear().apply();
-                Intent intent = new Intent(ListingActivity.this, MainActivity.class);
+                Intent intent = new Intent(ListingActivity.this, LoginActivity.class);
                 startActivity(intent);
                 Toast.makeText(this, "Logged out", Toast.LENGTH_SHORT).show();
                 return true;

@@ -22,6 +22,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import com.solution.it.newsoft.databinding.ActivityListingBinding;
 import com.solution.it.newsoft.databinding.DialogUpdateListBinding;
 import com.solution.it.newsoft.model.List;
+import com.solution.it.newsoft.util.PaginationScrollListener;
 
 import java.util.ArrayList;
 

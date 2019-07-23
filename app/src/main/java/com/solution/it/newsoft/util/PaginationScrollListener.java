@@ -1,4 +1,4 @@
-package com.solution.it.newsoft;
+package com.solution.it.newsoft.util;
 
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;

@@ -8,52 +8,46 @@ import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.solution.it.newsoft.databinding.NoteItemBinding;
-import com.solution.it.newsoft.model.Listing;
-import com.solution.it.newsoft.model.Login;
+import com.solution.it.newsoft.databinding.ItemListBinding;
+import com.solution.it.newsoft.model.List;
 
-public class ListingAdapter extends ListAdapter<Login, ListingAdapter.NoteHolder> {
+public class ListingAdapter extends ListAdapter<List, ListingAdapter.ListHolder> {
     private OnItemClickListener listener;
 
     public ListingAdapter() {
         super(DIFF_CALLBACK);
     }
 
-    private static final DiffUtil.ItemCallback<Login> DIFF_CALLBACK = new DiffUtil.ItemCallback<Login>() {
+    private static final DiffUtil.ItemCallback<List> DIFF_CALLBACK = new DiffUtil.ItemCallback<List>() {
         @Override
-        public boolean areItemsTheSame(Login oldItem, Login newItem) {
-            return oldItem.getId() == newItem.getId();
+        public boolean areItemsTheSame(List oldItem, List newItem) {
+            return oldItem.getId().equals(newItem.getId());
         }
 
         @Override
-        public boolean areContentsTheSame(Login oldItem, Login newItem) {
-            return oldItem.getTitle().equals(newItem.getTitle()) &&
-                    oldItem.getDescription().equals(newItem.getDescription()) &&
-                    oldItem.getPriority() == newItem.getPriority();
+        public boolean areContentsTheSame(List oldItem, List newItem) {
+            return oldItem.getList_name().equals(newItem.getList_name()) &&
+                    oldItem.getDistance().equals(newItem.getDistance());
         }
     };
 
     @NonNull
     @Override
-    public NoteHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        NoteItemBinding binding = NoteItemBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
-        return new NoteHolder(binding);
+    public ListHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        ItemListBinding binding = ItemListBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
+        return new ListHolder(binding);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull NoteHolder holder, int position) {
-        Login currentNote = getItem(position);
-        holder.binding.setNote(currentNote);
+    public void onBindViewHolder(@NonNull ListHolder holder, int position) {
+        List currentList = getItem(position);
+        holder.binding.setList(currentList);
     }
 
-    public Login getNoteAt(int position) {
-        return getItem(position);
-    }
+    class ListHolder extends RecyclerView.ViewHolder {
+        ItemListBinding binding;
 
-    class NoteHolder extends RecyclerView.ViewHolder {
-        NoteItemBinding binding;
-
-        public NoteHolder(NoteItemBinding binding) {
+        public ListHolder(ItemListBinding binding) {
             super(binding.getRoot());
             this.binding = binding;
 
@@ -69,13 +63,14 @@ public class ListingAdapter extends ListAdapter<Login, ListingAdapter.NoteHolder
                 if (listener != null && position != RecyclerView.NO_POSITION) {
                     listener.onItemLongClick(getItem(position));
                 }
+                return true;
             });
         }
     }
 
     public interface OnItemClickListener {
-        void onItemClick(Listing listing);
-        void onItemLongClick(Listing listing);
+        void onItemClick(List list);
+        void onItemLongClick(List list);
     }
 
     public void setOnItemClickListener(OnItemClickListener listener) {

@@ -11,15 +11,7 @@ public class Listing {
         return listing;
     }
 
-    public void setListing(ArrayList<List> listing) {
-        this.listing = listing;
-    }
-
     public Status getStatus() {
         return status;
-    }
-
-    public void setStatus(Status status) {
-        this.status = status;
     }
 }

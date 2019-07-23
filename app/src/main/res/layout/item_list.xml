@@ -5,8 +5,8 @@
 
     <data>
         <variable
-            name="note"
-            type="com.solution.it.newsoft.model.Login" />
+            name="list"
+            type="com.solution.it.newsoft.model.List" />
     </data>
 
     <androidx.cardview.widget.CardView
@@ -17,38 +17,29 @@
         android:layout_marginTop="8dp">
 
         <RelativeLayout
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="8dp">
 
             <TextView
-                android:id="@+id/text_view_priority"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:text="@{String.valueOf(note.priority)}"
-                android:textAppearance="@style/TextAppearance.AppCompat.Large"
-                tools:text="1" />
-
-            <TextView
-                android:id="@+id/text_view_title"
+                android:id="@+id/tv_list_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
-                android:layout_toStartOf="@id/text_view_priority"
                 android:ellipsize="end"
                 android:maxLines="1"
-                android:text="@{note.title}"
+                android:text="@{list.list_name}"
                 android:textAppearance="@style/TextAppearance.AppCompat.Large"
-                tools:text="Title" />
+                tools:text="List Name" />
 
             <TextView
-                android:id="@+id/text_view_description"
+                android:id="@+id/tv_distance"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/text_view_title"
-                android:text="@{note.description}"
-                tools:text="Description" />
+                android:layout_below="@id/tv_list_name"
+                android:text="@{list.distance}"
+                android:textSize="16sp"
+                tools:text="Distance" />
 
         </RelativeLayout>
 

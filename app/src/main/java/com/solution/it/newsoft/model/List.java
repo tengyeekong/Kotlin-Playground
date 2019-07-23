@@ -6,12 +6,6 @@ public class List {
     private String list_name;
     private String distance;
 
-    public List(String id, String list_name, String distance) {
-        this.id = id;
-        this.list_name = list_name;
-        this.distance = distance;
-    }
-
     public String getId() {
         return id;
     }
@@ -24,15 +18,7 @@ public class List {
         return list_name;
     }
 
-    public void setList_name(String list_name) {
-        this.list_name = list_name;
-    }
-
     public String getDistance() {
         return distance;
-    }
-
-    public void setDistance(String distance) {
-        this.distance = distance;
     }
 }

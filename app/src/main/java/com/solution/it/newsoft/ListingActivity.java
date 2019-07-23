@@ -1,91 +1,125 @@
 package com.solution.it.newsoft;
 
+import android.app.Dialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModelProviders;
-import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.solution.it.newsoft.databinding.ActivityListingBinding;
-import com.solution.it.newsoft.model.Listing;
-import com.solution.it.newsoft.model.Login;
+import com.solution.it.newsoft.databinding.DialogUpdateListBinding;
+import com.solution.it.newsoft.model.List;
 
 public class ListingActivity extends AppCompatActivity {
     private ActivityListingBinding binding;
     private com.solution.it.newsoft.ViewModel viewModel;
+    private Toast toast;
+    private ListingAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_listing);
 
+        getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+        getSupportActionBar().setDisplayShowHomeEnabled(false);
+
         binding.recyclerView.setLayoutManager(new LinearLayoutManager(this));
         binding.recyclerView.setHasFixedSize(true);
 
-        final ListingAdapter adapter = new ListingAdapter();
+        adapter = new ListingAdapter();
         binding.recyclerView.setAdapter(adapter);
 
         viewModel = ViewModelProviders.of(this).get(ViewModel.class);
         SharedPreferences prefs = viewModel.getPrefs();
-        String id = prefs.getString(ViewModel.ID, "");
-        String token = prefs.getString(ViewModel.TOKEN, "");
-        viewModel.getListing(id, token).observe(this, adapter::submitList);
+        refreshList(prefs);
+
+        binding.swipeRefresh.setOnRefreshListener(() -> refreshList(prefs));
 
         adapter.setOnItemClickListener(new ListingAdapter.OnItemClickListener() {
             @Override
-            public void onItemClick(Listing listing) {
-                Toast.makeText(ListingActivity.this, listing.getListing(), Toast.LENGTH_LONG).show();
+            public void onItemClick(List list) {
+                if (toast != null) toast.cancel();
+                toast = Toast.makeText(ListingActivity.this,
+                        new StringBuilder("List name: ").append(list.getList_name())
+                                .append("\n")
+                                .append("Distance: ").append(list.getDistance()), Toast.LENGTH_SHORT);
+                toast.show();
             }
 
             @Override
-            public void onItemLongClick(Listing listing) {
+            public void onItemLongClick(List list) {
+                String id = prefs.getString(ViewModel.ID, "");
+                String username = prefs.getString(ViewModel.USERNAME, "");
+                String password = prefs.getString(ViewModel.PASSWORD, "");
+                String token = prefs.getString(ViewModel.TOKEN, "");
+                Dialog dialog = new Dialog(ListingActivity.this);
+                DialogUpdateListBinding dialogBinding = DialogUpdateListBinding.inflate(LayoutInflater.from(ListingActivity.this), (ViewGroup) binding.getRoot(), false);
+                dialogBinding.setList(list);
 
+                dialogBinding.btnUpdate.setOnClickListener(view -> {
+                    LiveData<Boolean> isUpdated = viewModel.updateList(list.getId(), dialogBinding.etListName.getText().toString(),
+                            dialogBinding.etDistance.getText().toString());
+                    isUpdated.observe(ListingActivity.this, aBoolean -> {
+                        if (aBoolean) {
+                            viewModel.getListing(id, token).observe(ListingActivity.this, adapter::submitList);
+                        } else {
+                            viewModel.login(username, password).observe(ListingActivity.this, login -> {
+                                if (login != null && login.getStatus().getCode().equals("200")) {
+                                    isUpdated.observe(ListingActivity.this, aBoolean1 -> {
+                                        if (aBoolean1) {
+                                            viewModel.getListing(prefs.getString(ViewModel.ID, ""),
+                                                    prefs.getString(ViewModel.TOKEN, "")).observe(ListingActivity.this, adapter::submitList);
+                                        }
+                                    });
+                                }
+                            });
+                        }
+                        dialog.dismiss();
+                    });
+                });
+                dialog.setContentView(dialogBinding.getRoot());
+                dialog.show();
+                Window window = dialog.getWindow();
+                window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
             }
         });
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if (requestCode == ADD_NOTE_REQUEST && resultCode == RESULT_OK) {
-            String title = data.getStringExtra(AddEditNoteActivity.EXTRA_TITLE);
-            String description = data.getStringExtra(AddEditNoteActivity.EXTRA_DESCRIPTION);
-            int priority = data.getIntExtra(AddEditNoteActivity.EXTRA_PRIORITY, 1);
-
-            Login note = new Login(title, description, priority);
-            viewModel.insert(note);
-
-            Toast.makeText(this, "Login saved", Toast.LENGTH_SHORT).show();
-        } else if (requestCode == EDIT_NOTE_REQUEST && resultCode == RESULT_OK) {
-            int id = data.getIntExtra(AddEditNoteActivity.EXTRA_ID, -1);
-
-            if (id == -1) {
-                Toast.makeText(this, "Login can't be updated", Toast.LENGTH_SHORT).show();
-                return;
+    private void refreshList(SharedPreferences prefs) {
+        String username = prefs.getString(ViewModel.USERNAME, "");
+        String password = prefs.getString(ViewModel.PASSWORD, "");
+        String id = prefs.getString(ViewModel.ID, "");
+        String token = prefs.getString(ViewModel.TOKEN, "");
+        binding.swipeRefresh.setRefreshing(true);
+        viewModel.getListing(id, token).observe(this, lists -> {
+            if (lists == null) {
+                viewModel.login(username, password).observe(this, login -> {
+                    if (login != null && login.getStatus().getCode().equals("200")) {
+                        viewModel.getListing(prefs.getString(ViewModel.ID, ""),
+                                prefs.getString(ViewModel.TOKEN, "")).observe(this, lists1 -> {
+                            adapter.submitList(lists1);
+                            binding.swipeRefresh.setRefreshing(false);
+                        });
+                    }
+                });
+            } else {
+                adapter.submitList(lists);
+                binding.swipeRefresh.setRefreshing(false);
             }
-
-            String title = data.getStringExtra(AddEditNoteActivity.EXTRA_TITLE);
-            String description = data.getStringExtra(AddEditNoteActivity.EXTRA_DESCRIPTION);
-            int priority = data.getIntExtra(AddEditNoteActivity.EXTRA_PRIORITY, 1);
-
-            Login note = new Login(title, description, priority);
-            note.setId(id);
-            viewModel.update(note);
-
-            Toast.makeText(this, "Login updated", Toast.LENGTH_SHORT).show();
-        } else {
-            Toast.makeText(this, "Login not saved", Toast.LENGTH_SHORT).show();
-        }
+        });
     }
 
     @Override
@@ -98,12 +132,20 @@ public class ListingActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.delete_all_notes:
-                viewModel.deleteAllNotes();
-                Toast.makeText(this, "All notes deleted", Toast.LENGTH_SHORT).show();
+            case R.id.logout:
+                viewModel.getPrefs().edit().clear().apply();
+                Intent intent = new Intent(ListingActivity.this, MainActivity.class);
+                startActivity(intent);
+                Toast.makeText(this, "Logged out", Toast.LENGTH_SHORT).show();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        finishAffinity();
     }
 }

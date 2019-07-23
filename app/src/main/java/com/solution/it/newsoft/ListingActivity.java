@@ -106,6 +106,8 @@ public class ListingActivity extends AppCompatActivity {
         binding.swipeRefresh.setRefreshing(true);
         viewModel.getListing(id, token).observe(this, lists -> {
             if (lists == null) {
+                //can't use retrofit interceptor in this case to get new token
+                //since the token is not passing through header
                 viewModel.login(username, password).observe(this, login -> {
                     if (login != null && login.getStatus().getCode().equals("200")) {
                         viewModel.getListing(prefs.getString(ViewModel.ID, ""),

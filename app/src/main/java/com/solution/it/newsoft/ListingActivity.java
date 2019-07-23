@@ -4,6 +4,7 @@ import android.app.Dialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -22,11 +23,19 @@ import com.solution.it.newsoft.databinding.ActivityListingBinding;
 import com.solution.it.newsoft.databinding.DialogUpdateListBinding;
 import com.solution.it.newsoft.model.List;
 
+import java.util.ArrayList;
+
 public class ListingActivity extends AppCompatActivity {
     private ActivityListingBinding binding;
     private com.solution.it.newsoft.ViewModel viewModel;
     private Toast toast;
     private ListingAdapter adapter;
+
+    private static final int PAGE_START = 0;
+    private boolean isLoading = false;
+    private boolean isLastPage = false;
+    private int TOTAL_PAGES = 3;
+    private int currentPage = PAGE_START;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,7 +45,8 @@ public class ListingActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(false);
         getSupportActionBar().setDisplayShowHomeEnabled(false);
 
-        binding.recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        binding.recyclerView.setLayoutManager(layoutManager);
         binding.recyclerView.setHasFixedSize(true);
 
         adapter = new ListingAdapter();
@@ -45,6 +55,32 @@ public class ListingActivity extends AppCompatActivity {
         viewModel = ViewModelProviders.of(this).get(ViewModel.class);
         SharedPreferences prefs = viewModel.getPrefs();
         refreshList(prefs);
+
+        binding.recyclerView.addOnScrollListener(new PaginationScrollListener(layoutManager) {
+            @Override
+            protected void loadMoreItems() {
+                if (isLoading) return;
+                isLoading = true;
+//                currentPage += 1;
+                adapter.addLoadingFooter();
+                new Handler().postDelayed(() -> loadNextPage(), 1000);
+            }
+
+            @Override
+            public int getTotalPageCount() {
+                return TOTAL_PAGES;
+            }
+
+            @Override
+            public boolean isLastPage() {
+                return isLastPage;
+            }
+
+            @Override
+            public boolean isLoading() {
+                return isLoading;
+            }
+        });
 
         binding.swipeRefresh.setOnRefreshListener(() -> refreshList(prefs));
 
@@ -60,11 +96,9 @@ public class ListingActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onItemLongClick(List list) {
-                String id = prefs.getString(ViewModel.ID, "");
+            public void onItemLongClick(List list, int position) {
                 String username = prefs.getString(ViewModel.USERNAME, "");
                 String password = prefs.getString(ViewModel.PASSWORD, "");
-                String token = prefs.getString(ViewModel.TOKEN, "");
                 Dialog dialog = new Dialog(ListingActivity.this);
                 DialogUpdateListBinding dialogBinding = DialogUpdateListBinding.inflate(LayoutInflater.from(ListingActivity.this), (ViewGroup) binding.getRoot(), false);
                 dialogBinding.setList(list);
@@ -74,19 +108,22 @@ public class ListingActivity extends AppCompatActivity {
                             dialogBinding.etDistance.getText().toString());
                     isUpdated.observe(ListingActivity.this, aBoolean -> {
                         if (aBoolean) {
-                            viewModel.getListing(id, token).observe(ListingActivity.this, adapter::submitList);
+                            adapter.updateList(position, dialogBinding.etListName.getText().toString(),
+                                    dialogBinding.etDistance.getText().toString());
                         } else {
                             viewModel.login(username, password).observe(ListingActivity.this, login -> {
                                 if (login != null && login.getStatus().getCode().equals("200")) {
                                     isUpdated.observe(ListingActivity.this, aBoolean1 -> {
                                         if (aBoolean1) {
-                                            viewModel.getListing(prefs.getString(ViewModel.ID, ""),
-                                                    prefs.getString(ViewModel.TOKEN, "")).observe(ListingActivity.this, adapter::submitList);
+                                            adapter.updateList(position, dialogBinding.etListName.getText().toString(),
+                                                    dialogBinding.etDistance.getText().toString());
                                         }
                                     });
                                 }
                             });
                         }
+                        isLoading = false;
+                        isLastPage = false;
                         dialog.dismiss();
                     });
                 });
@@ -121,7 +158,17 @@ public class ListingActivity extends AppCompatActivity {
                 adapter.submitList(lists);
                 binding.swipeRefresh.setRefreshing(false);
             }
+            isLoading = false;
+            isLastPage = false;
         });
+    }
+
+    private void loadNextPage() {
+        ArrayList<List> lists = List.createMovies(adapter.getItemCount());
+
+        if (lists.size() == 0) isLastPage = true;
+        adapter.removeLoadingFooter(lists);
+        isLoading = false;
     }
 
     @Override

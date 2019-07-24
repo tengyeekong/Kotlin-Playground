@@ -80,8 +80,7 @@ class ViewModel extends AndroidViewModel {
                 .delay(1, TimeUnit.SECONDS)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(result -> ((MediatorLiveData<ArrayList<List>>) liveLists).postValue(result),
-                        throwable -> {}));
+                .subscribe(((MediatorLiveData<ArrayList<List>>) liveLists)::postValue));
 
         return liveLists;
     }

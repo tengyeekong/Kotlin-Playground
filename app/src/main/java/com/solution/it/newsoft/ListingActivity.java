@@ -74,6 +74,7 @@ public class ListingActivity extends AppCompatActivity {
             }
         });
 
+        binding.swipeRefresh.setColorSchemeColors(getColor(R.color.colorPrimary));
         binding.swipeRefresh.setOnRefreshListener(() -> refreshList(prefs));
 
         adapter.setOnItemClickListener(new ListingAdapter.OnItemClickListener() {

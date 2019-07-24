@@ -114,8 +114,6 @@ public class ListingActivity extends AppCompatActivity {
                                 }
                             });
                         }
-                        isLoading = false;
-                        isLastPage = false;
                         dialog.dismiss();
                     });
                 });

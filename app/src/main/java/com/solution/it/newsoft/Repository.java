@@ -5,7 +5,7 @@ import android.content.SharedPreferences;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
-import com.solution.it.newsoft.api.GetDataService;
+import com.solution.it.newsoft.api.ApiService;
 import com.solution.it.newsoft.api.RetrofitClientInstance;
 import com.solution.it.newsoft.model.List;
 import com.solution.it.newsoft.model.Listing;
@@ -19,7 +19,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class Repository {
-    private GetDataService service;
+    private ApiService service;
     private static Repository repository;
     private static String id, username, password, token;
     private static SharedPreferences prefs;
@@ -37,7 +37,7 @@ public class Repository {
     }
 
     public Repository() {
-        service = RetrofitClientInstance.getRetrofitInstance().create(GetDataService.class);
+        service = RetrofitClientInstance.getRetrofitInstance().create(ApiService.class);
     }
 
     public LiveData<ArrayList<List>> getListing(String id, String token) {

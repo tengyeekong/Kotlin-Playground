@@ -1,10 +1,9 @@
 package com.solution.it.newsoft.model;
 
-public class Login {
+public class Login extends UpdateStatus {
 
     private String id;
     private String token;
-    private Status status;
 
     public String getId() {
         return id;
@@ -16,9 +15,5 @@ public class Login {
 
     public String getToken() {
         return token;
-    }
-
-    public Status getStatus() {
-        return status;
     }
 }

@@ -2,16 +2,11 @@ package com.solution.it.newsoft.model;
 
 import java.util.ArrayList;
 
-public class Listing {
+public class Listing extends UpdateStatus {
 
     private ArrayList<List> listing;
-    private Status status;
 
     public ArrayList<List> getListing() {
         return listing;
-    }
-
-    public Status getStatus() {
-        return status;
     }
 }

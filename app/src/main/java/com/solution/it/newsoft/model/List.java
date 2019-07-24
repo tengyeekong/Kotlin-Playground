@@ -1,7 +1,5 @@
 package com.solution.it.newsoft.model;
 
-import java.util.ArrayList;
-
 public class List {
 
     private String id;
@@ -38,15 +36,5 @@ public class List {
 
     public void setDistance(String distance) {
         this.distance = distance;
-    }
-
-    public static ArrayList<List> createMovies(int itemCount) {
-        ArrayList<List> lists = new ArrayList<>();
-        if (itemCount <= 50)
-            for (int i = 0; i < 10; i++) {
-                List list = new List("100" + (itemCount + i), "100" + (itemCount + i), "100" + (itemCount + i));
-                lists.add(list);
-            }
-        return lists;
     }
 }

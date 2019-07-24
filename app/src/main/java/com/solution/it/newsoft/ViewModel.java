@@ -9,17 +9,24 @@ import android.net.NetworkInfo;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MediatorLiveData;
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.schedulers.Schedulers;
 
 import com.solution.it.newsoft.model.List;
 import com.solution.it.newsoft.model.Login;
 
 import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
 
 class ViewModel extends AndroidViewModel {
     public static final String USERNAME = "username";
     public static final String PASSWORD = "password";
     public static final String ID = "id";
     public static final String TOKEN = "token";
+    private final CompositeDisposable disposables = new CompositeDisposable();
     private Repository repository;
     private SharedPreferences prefs;
 
@@ -48,7 +55,7 @@ class ViewModel extends AndroidViewModel {
         return repository.updateList(id, listName, distance);
     }
 
-    public static boolean checkInternetConnection(Context context) {
+    public boolean checkInternetConnection(Context context) {
         ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
         if (activeNetwork != null) {
@@ -56,5 +63,31 @@ class ViewModel extends AndroidViewModel {
         } else {
             return false;
         }
+    }
+
+    public LiveData<ArrayList<List>> getDummies(int itemCount) {
+        ArrayList<List> lists = new ArrayList<>();
+        LiveData<ArrayList<List>> liveLists = new MediatorLiveData<>();
+        disposables.add(Observable.fromCallable(() -> {
+            if (itemCount < 50)
+                for (int i = 0; i < 10; i++) {
+                    List list = new List("100" + (itemCount + (i + 1)),
+                            "100" + (itemCount + (i + 1)), "100" + (itemCount + (i + 1)));
+                    lists.add(list);
+                }
+            return lists;
+        })
+                .delay(1, TimeUnit.SECONDS)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(result -> ((MediatorLiveData<ArrayList<List>>) liveLists).postValue(result),
+                        throwable -> {}));
+
+        return liveLists;
+    }
+
+    @Override
+    protected void onCleared() {
+        disposables.clear();
     }
 }

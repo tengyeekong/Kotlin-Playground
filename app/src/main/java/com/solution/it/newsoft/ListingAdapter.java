@@ -58,8 +58,10 @@ public class ListingAdapter extends ListAdapter<List, RecyclerView.ViewHolder> {
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         switch (getItemViewType(position)) {
             case ITEM:
-                List currentList = getItem(position);
-                ((ListHolder) holder).binding.setList(currentList);
+                if (holder instanceof ListHolder) {
+                    List currentList = getItem(position);
+                    ((ListHolder) holder).binding.setList(currentList);
+                }
                 break;
             case LOADING:
                 break;
@@ -79,21 +81,25 @@ public class ListingAdapter extends ListAdapter<List, RecyclerView.ViewHolder> {
     }
 
     public void addLoadingFooter() {
-        isLoadingAdded = true;
-        ArrayList list = new ArrayList<>();
-        list.addAll(getList());
-        list.add(new List());
-        submitList(list);
+        int position = getItemCount() - 1;
+        List item = getItem(position);
+
+        if (item != null && item.getId() != null) {
+            isLoadingAdded = true;
+            ArrayList list = new ArrayList<>();
+            list.addAll(getList());
+            list.add(new List());
+            submitList(list);
+        }
     }
 
     public void removeLoadingFooter(ArrayList newList) {
         isLoadingAdded = false;
-
-        ArrayList<List> oriList = new ArrayList(getList());
-        int position = oriList.size() - 1;
-        List item = oriList.get(position);
+        int position = getItemCount() - 1;
+        List item = getItem(position);
 
         if (item != null && item.getId() == null) {
+            ArrayList<List> oriList = new ArrayList(getList());
             oriList.remove(item);
             newList.addAll(0, oriList);
             submitList(newList);

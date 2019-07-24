@@ -4,7 +4,6 @@ import android.app.Dialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -25,6 +24,7 @@ import com.solution.it.newsoft.model.List;
 import com.solution.it.newsoft.util.PaginationScrollListener;
 
 import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
 
 public class ListingActivity extends AppCompatActivity {
     private ActivityListingBinding binding;
@@ -32,11 +32,8 @@ public class ListingActivity extends AppCompatActivity {
     private Toast toast;
     private ListingAdapter adapter;
 
-    private static final int PAGE_START = 0;
     private boolean isLoading = false;
     private boolean isLastPage = false;
-    private int TOTAL_PAGES = 3;
-    private int currentPage = PAGE_START;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,14 +59,8 @@ public class ListingActivity extends AppCompatActivity {
             protected void loadMoreItems() {
                 if (isLoading) return;
                 isLoading = true;
-//                currentPage += 1;
                 adapter.addLoadingFooter();
-                new Handler().postDelayed(() -> loadNextPage(), 1000);
-            }
-
-            @Override
-            public int getTotalPageCount() {
-                return TOTAL_PAGES;
+                loadNextPage();
             }
 
             @Override
@@ -165,11 +156,13 @@ public class ListingActivity extends AppCompatActivity {
     }
 
     private void loadNextPage() {
-        ArrayList<List> lists = List.createMovies(adapter.getItemCount());
+        LiveData<ArrayList<List>> lists = viewModel.getDummies(adapter.getItemCount());
 
-        if (lists.size() == 0) isLastPage = true;
-        adapter.removeLoadingFooter(lists);
-        isLoading = false;
+        lists.observe(this, lists1 -> {
+            if (lists1.size() == 0) isLastPage = true;
+            adapter.removeLoadingFooter(lists1);
+            isLoading = false;
+        });
     }
 
     @Override

@@ -100,26 +100,6 @@ class ViewModel extends AndroidViewModel {
         }
     }
 
-    public LiveData<ArrayList<List>> getDummies(int itemCount) {
-        ArrayList<List> lists = new ArrayList<>();
-        LiveData<ArrayList<List>> liveLists = new MediatorLiveData<>();
-        disposables.add(Observable.fromCallable(() -> {
-            if (itemCount < 50)
-                for (int i = 0; i < 10; i++) {
-                    List list = new List("100" + (itemCount + (i + 1)),
-                            "100" + (itemCount + (i + 1)), "100" + (itemCount + (i + 1)));
-                    lists.add(list);
-                }
-            return lists;
-        })
-                .delay(1, TimeUnit.SECONDS)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(((MediatorLiveData<ArrayList<List>>) liveLists)::postValue));
-
-        return liveLists;
-    }
-
     @Override
     protected void onCleared() {
         disposables.clear();

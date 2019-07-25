@@ -1,6 +1,7 @@
 package com.solution.it.newsoft;
 
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -71,12 +72,15 @@ public class ListingActivity extends AppCompatActivity {
                 dialogBinding.setList(list);
 
                 dialogBinding.btnUpdate.setOnClickListener(view -> {
+                    ProgressDialog progress = ProgressDialog.show(ListingActivity.this, "", "Updating...", true);
+                    progress.show();
                     LiveData<Boolean> isUpdated = viewModel.updateList(list.getId(), dialogBinding.etListName.getText().toString(),
                             dialogBinding.etDistance.getText().toString());
                     isUpdated.observe(ListingActivity.this, aBoolean -> {
                         if (aBoolean) {
                             adapter.updateList(position, dialogBinding.etListName.getText().toString(),
                                     dialogBinding.etDistance.getText().toString());
+                            progress.dismiss();
                         } else {
                             viewModel.login(username, password).observe(ListingActivity.this, login -> {
                                 if (login != null && login.getStatus().getCode().equals("200")) {
@@ -85,8 +89,10 @@ public class ListingActivity extends AppCompatActivity {
                                             adapter.updateList(position, dialogBinding.etListName.getText().toString(),
                                                     dialogBinding.etDistance.getText().toString());
                                         }
+                                        progress.dismiss();
                                     });
                                 }
+                                else progress.dismiss();
                             });
                         }
                         dialog.dismiss();

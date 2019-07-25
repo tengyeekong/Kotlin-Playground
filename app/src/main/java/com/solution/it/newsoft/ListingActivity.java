@@ -65,43 +65,7 @@ public class ListingActivity extends AppCompatActivity {
 
             @Override
             public void onItemLongClick(List list, int position) {
-                String username = prefs.getString(ViewModel.USERNAME, "");
-                String password = prefs.getString(ViewModel.PASSWORD, "");
-                Dialog dialog = new Dialog(ListingActivity.this);
-                DialogUpdateListBinding dialogBinding = DialogUpdateListBinding.inflate(LayoutInflater.from(ListingActivity.this), (ViewGroup) binding.getRoot(), false);
-                dialogBinding.setList(list);
-
-                dialogBinding.btnUpdate.setOnClickListener(view -> {
-                    ProgressDialog progress = ProgressDialog.show(ListingActivity.this, "", "Updating...", true);
-                    progress.show();
-                    LiveData<Boolean> isUpdated = viewModel.updateList(list.getId(), dialogBinding.etListName.getText().toString(),
-                            dialogBinding.etDistance.getText().toString());
-                    isUpdated.observe(ListingActivity.this, aBoolean -> {
-                        if (aBoolean) {
-                            adapter.updateList(position, dialogBinding.etListName.getText().toString(),
-                                    dialogBinding.etDistance.getText().toString());
-                            progress.dismiss();
-                        } else {
-                            viewModel.login(username, password).observe(ListingActivity.this, login -> {
-                                if (login != null && login.getStatus().getCode().equals("200")) {
-                                    isUpdated.observe(ListingActivity.this, aBoolean1 -> {
-                                        if (aBoolean1) {
-                                            adapter.updateList(position, dialogBinding.etListName.getText().toString(),
-                                                    dialogBinding.etDistance.getText().toString());
-                                        }
-                                        progress.dismiss();
-                                    });
-                                }
-                                else progress.dismiss();
-                            });
-                        }
-                        dialog.dismiss();
-                    });
-                });
-                dialog.setContentView(dialogBinding.getRoot());
-                dialog.show();
-                Window window = dialog.getWindow();
-                window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                showUpdateDialog(list, position, prefs);
             }
         });
     }
@@ -126,6 +90,50 @@ public class ListingActivity extends AppCompatActivity {
                 adapter.submitList(lists);
                 binding.swipeRefresh.setRefreshing(false);
             }
+        });
+    }
+
+    private void showUpdateDialog(List list, int position, SharedPreferences prefs) {
+        Dialog dialog = new Dialog(ListingActivity.this);
+        DialogUpdateListBinding dialogBinding = DialogUpdateListBinding.inflate(LayoutInflater.from(ListingActivity.this), (ViewGroup) binding.getRoot(), false);
+        dialogBinding.setList(list);
+
+        dialogBinding.btnUpdate.setOnClickListener(view -> {
+            updateList(dialogBinding, list, position, prefs, dialog);
+        });
+        dialog.setContentView(dialogBinding.getRoot());
+        dialog.show();
+        Window window = dialog.getWindow();
+        window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+    }
+
+    private void updateList(DialogUpdateListBinding dialogBinding, List list, int position,
+                            SharedPreferences prefs, Dialog dialog) {
+        String username = prefs.getString(ViewModel.USERNAME, "");
+        String password = prefs.getString(ViewModel.PASSWORD, "");
+        ProgressDialog progress = ProgressDialog.show(ListingActivity.this, "", "Updating...", true);
+        progress.show();
+        LiveData<Boolean> isUpdated = viewModel.updateList(list.getId(), dialogBinding.etListName.getText().toString(),
+                dialogBinding.etDistance.getText().toString());
+        isUpdated.observe(ListingActivity.this, aBoolean -> {
+            if (aBoolean) {
+                adapter.updateList(position, dialogBinding.etListName.getText().toString(),
+                        dialogBinding.etDistance.getText().toString());
+                progress.dismiss();
+            } else {
+                viewModel.login(username, password).observe(ListingActivity.this, login -> {
+                    if (login != null && login.getStatus().getCode().equals("200")) {
+                        isUpdated.observe(ListingActivity.this, aBoolean1 -> {
+                            if (aBoolean1) {
+                                adapter.updateList(position, dialogBinding.etListName.getText().toString(),
+                                        dialogBinding.etDistance.getText().toString());
+                            }
+                            progress.dismiss();
+                        });
+                    } else progress.dismiss();
+                });
+            }
+            dialog.dismiss();
         });
     }
 

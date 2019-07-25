@@ -40,27 +40,27 @@ public class Repository {
         service = RetrofitClientInstance.getRetrofitInstance().create(ApiService.class);
     }
 
-    public LiveData<ArrayList<List>> getListing(String id, String token) {
-        MutableLiveData<ArrayList<List>> listingData = new MutableLiveData<>();
-        service.getListing(id, token).enqueue(new Callback<Listing>() {
-            @Override
-            public void onResponse(Call<Listing> call, Response<Listing> response) {
-                if (response.isSuccessful()) {
-                    if (response.body().getStatus().getCode().equals("200")) {
-                        listingData.setValue(response.body().getListing());
-                        return;
-                    }
-                }
-                listingData.setValue(null);
-            }
-
-            @Override
-            public void onFailure(Call<Listing> call, Throwable t) {
-                listingData.setValue(null);
-            }
-        });
-        return listingData;
-    }
+//    public LiveData<ArrayList<List>> getListing(String id, String token) {
+//        MutableLiveData<ArrayList<List>> listingData = new MutableLiveData<>();
+//        service.getListing(id, token).enqueue(new Callback<Listing>() {
+//            @Override
+//            public void onResponse(Call<Listing> call, Response<Listing> response) {
+//                if (response.isSuccessful()) {
+//                    if (response.body().getStatus().getCode().equals("200")) {
+//                        listingData.setValue(response.body().getListing());
+//                        return;
+//                    }
+//                }
+//                listingData.setValue(null);
+//            }
+//
+//            @Override
+//            public void onFailure(Call<Listing> call, Throwable t) {
+//                listingData.setValue(null);
+//            }
+//        });
+//        return listingData;
+//    }
 
     public LiveData<Login> login(String username, String password) {
         MutableLiveData<Login> loginData = new MutableLiveData<>();

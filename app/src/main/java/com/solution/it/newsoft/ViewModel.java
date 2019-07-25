@@ -10,6 +10,9 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MediatorLiveData;
+import androidx.lifecycle.Transformations;
+import androidx.paging.LivePagedListBuilder;
+import androidx.paging.PagedList;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
@@ -17,8 +20,11 @@ import io.reactivex.schedulers.Schedulers;
 
 import com.solution.it.newsoft.model.List;
 import com.solution.it.newsoft.model.Login;
+import com.solution.it.newsoft.model.NetworkState;
 
 import java.util.ArrayList;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 class ViewModel extends AndroidViewModel {
@@ -30,20 +36,49 @@ class ViewModel extends AndroidViewModel {
     private Repository repository;
     private SharedPreferences prefs;
 
+    private Executor executor;
+    private ListDataFactory listDataFactory;
+    private PagedList.Config pagedListConfig;
+    private LiveData<NetworkState> networkState;
+    private LiveData<PagedList<List>> listLiveData;
+
     public ViewModel(@NonNull Application application) {
         super(application);
         prefs = application.getSharedPreferences(BuildConfig.APPLICATION_ID, Context.MODE_PRIVATE);
         repository = Repository.getInstance(prefs);
+        executor = Executors.newFixedThreadPool(5);
+        listDataFactory = new ListDataFactory(prefs);
+
+        networkState = Transformations.switchMap(listDataFactory.getMutableLiveData(),
+                dataSource -> dataSource.getNetworkState());
+
+        pagedListConfig = (new PagedList.Config.Builder())
+                .setEnablePlaceholders(false)
+                .setInitialLoadSizeHint(10)
+                .setPageSize(10).build();
+
+        listLiveData = (new LivePagedListBuilder<>(listDataFactory, pagedListConfig))
+                .setFetchExecutor(executor)
+                .build();
+    }
+
+    public LiveData<NetworkState> getNetworkState() {
+        return networkState;
+    }
+
+    public LiveData<PagedList<List>> getListLiveData() {
+        listDataFactory.reload();
+        return listLiveData;
     }
 
     public SharedPreferences getPrefs() {
         return prefs;
     }
 
-    public LiveData<ArrayList<List>> getListing(String id, String token) {
-        if (!checkInternetConnection(getApplication())) return null;
-        return repository.getListing(id, token);
-    }
+//    public LiveData<ArrayList<List>> getListing(String id, String token) {
+//        if (!checkInternetConnection(getApplication())) return null;
+//        return repository.getListing(id, token);
+//    }
 
     public LiveData<Login> login(String username, String password) {
         if (!checkInternetConnection(getApplication())) return null;

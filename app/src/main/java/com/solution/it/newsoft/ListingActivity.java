@@ -21,19 +21,12 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import com.solution.it.newsoft.databinding.ActivityListingBinding;
 import com.solution.it.newsoft.databinding.DialogUpdateListBinding;
 import com.solution.it.newsoft.model.List;
-import com.solution.it.newsoft.util.PaginationScrollListener;
-
-import java.util.ArrayList;
-import java.util.concurrent.TimeUnit;
 
 public class ListingActivity extends AppCompatActivity {
     private ActivityListingBinding binding;
     private com.solution.it.newsoft.ViewModel viewModel;
     private Toast toast;
     private ListingAdapter adapter;
-
-    private boolean isLoading = false;
-    private boolean isLastPage = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,26 +46,7 @@ public class ListingActivity extends AppCompatActivity {
         viewModel = ViewModelProviders.of(this).get(ViewModel.class);
         SharedPreferences prefs = viewModel.getPrefs();
         refreshList(prefs);
-
-        binding.recyclerView.addOnScrollListener(new PaginationScrollListener(layoutManager) {
-            @Override
-            protected void loadMoreItems() {
-                if (isLoading) return;
-                isLoading = true;
-                adapter.addLoadingFooter();
-                loadNextPage();
-            }
-
-            @Override
-            public boolean isLastPage() {
-                return isLastPage;
-            }
-
-            @Override
-            public boolean isLoading() {
-                return isLoading;
-            }
-        });
+        viewModel.getNetworkState().observe(this, networkState -> adapter.setNetworkState(networkState));
 
         binding.swipeRefresh.setColorSchemeColors(getColor(R.color.colorPrimary));
         binding.swipeRefresh.setOnRefreshListener(() -> refreshList(prefs));
@@ -129,17 +103,14 @@ public class ListingActivity extends AppCompatActivity {
     private void refreshList(SharedPreferences prefs) {
         String username = prefs.getString(ViewModel.USERNAME, "");
         String password = prefs.getString(ViewModel.PASSWORD, "");
-        String id = prefs.getString(ViewModel.ID, "");
-        String token = prefs.getString(ViewModel.TOKEN, "");
         binding.swipeRefresh.setRefreshing(true);
-        viewModel.getListing(id, token).observe(this, lists -> {
+        viewModel.getListLiveData().observe(this, lists -> {
             if (lists == null) {
                 //can't use retrofit interceptor in this case to get new token
                 //since the token is not passing through header
                 viewModel.login(username, password).observe(this, login -> {
                     if (login != null && login.getStatus().getCode().equals("200")) {
-                        viewModel.getListing(prefs.getString(ViewModel.ID, ""),
-                                prefs.getString(ViewModel.TOKEN, "")).observe(this, lists1 -> {
+                        viewModel.getListLiveData().observe(this, lists1 -> {
                             adapter.submitList(lists1);
                             binding.swipeRefresh.setRefreshing(false);
                         });
@@ -149,18 +120,6 @@ public class ListingActivity extends AppCompatActivity {
                 adapter.submitList(lists);
                 binding.swipeRefresh.setRefreshing(false);
             }
-            isLoading = false;
-            isLastPage = false;
-        });
-    }
-
-    private void loadNextPage() {
-        LiveData<ArrayList<List>> lists = viewModel.getDummies(adapter.getItemCount());
-
-        lists.observe(this, lists1 -> {
-            if (lists1.size() == 0) isLastPage = true;
-            adapter.removeLoadingFooter(lists1);
-            isLoading = false;
         });
     }
 

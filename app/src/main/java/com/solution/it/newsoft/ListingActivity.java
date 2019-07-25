@@ -116,18 +116,18 @@ public class ListingActivity extends AppCompatActivity {
         LiveData<String> statusCode = viewModel.updateList(list.getId(), dialogBinding.etListName.getText().toString(),
                 dialogBinding.etDistance.getText().toString());
         statusCode.observe(ListingActivity.this, s -> {
-            if (s.equals("200")) {
+            if (s != null && s.equals("200")) {
                 adapter.updateList(position, dialogBinding.etListName.getText().toString(),
                         dialogBinding.etDistance.getText().toString());
                 progress.dismiss();
             }
-            else if (s.equals("400")) {
+            else if (s != null && s.equals("400")) {
                 viewModel.login(username, password).observe(ListingActivity.this, login -> {
                     if (login != null && login.getStatus().getCode().equals("200")) {
                         LiveData<String> statusCode1 = viewModel.updateList(list.getId(), dialogBinding.etListName.getText().toString(),
                                 dialogBinding.etDistance.getText().toString());
                         statusCode1.observe(ListingActivity.this, s1 -> {
-                            if (s1.equals("200")) {
+                            if (s1 != null && s1.equals("200")) {
                                 adapter.updateList(position, dialogBinding.etListName.getText().toString(),
                                         dialogBinding.etDistance.getText().toString());
                             }

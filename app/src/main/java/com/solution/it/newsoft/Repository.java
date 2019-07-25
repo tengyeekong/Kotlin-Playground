@@ -92,22 +92,24 @@ public class Repository {
     }
 
     public LiveData<String> updateList(String listing_id, String listing_name, String distance) {
-        MutableLiveData<String> isUpdated = new MutableLiveData<>();
+        MutableLiveData<String> statusCode = new MutableLiveData<>();
         service.updateList(id, token, listing_id, listing_name, distance).enqueue(new Callback<UpdateStatus>() {
             @Override
             public void onResponse(Call<UpdateStatus> call, Response<UpdateStatus> response) {
                 if (response.isSuccessful()) {
-                    if (response.body().getStatus() != null)
-                        isUpdated.setValue(response.body().getStatus().getCode());
+                    if (response.body().getStatus() != null) {
+                        statusCode.setValue(response.body().getStatus().getCode());
+                        return;
+                    }
                 }
-                isUpdated.setValue(null);
+                statusCode.setValue(null);
             }
 
             @Override
             public void onFailure(Call<UpdateStatus> call, Throwable t) {
-                isUpdated.setValue(null);
+                statusCode.setValue(null);
             }
         });
-        return isUpdated;
+        return statusCode;
     }
 }

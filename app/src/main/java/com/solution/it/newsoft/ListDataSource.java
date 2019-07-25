@@ -83,34 +83,36 @@ public class ListDataSource extends PageKeyedDataSource<Long, List> {
         networkState.postValue(NetworkState.LOADING);
 
         long nextKey = params.key + 1;
-//        callback.onResult(getDummies(Integer.valueOf(params.key.toString()) * 10), nextKey);
-//        networkState.postValue(NetworkState.LOADED);
-
-        service.getListing(prefs.getString(ViewModel.ID, ""), prefs.getString(ViewModel.TOKEN, "")).enqueue(new Callback<Listing>() {
-            @Override
-            public void onResponse(Call<Listing> call, Response<Listing> response) {
-                if (response.isSuccessful()) {
-                    if (response.body().getStatus().getCode().equals("200")) {
-                        callback.onResult(response.body().getListing(), nextKey);
-                        networkState.postValue(NetworkState.LOADED);
-                        return;
+        if (params.key % 2 == 0) {
+            callback.onResult(getDummies(Integer.valueOf(params.key.toString()) * 10), nextKey);
+            networkState.postValue(NetworkState.LOADED);
+        } else {
+            service.getListing(prefs.getString(ViewModel.ID, ""), prefs.getString(ViewModel.TOKEN, "")).enqueue(new Callback<Listing>() {
+                @Override
+                public void onResponse(Call<Listing> call, Response<Listing> response) {
+                    if (response.isSuccessful()) {
+                        if (response.body().getStatus().getCode().equals("200")) {
+                            callback.onResult(response.body().getListing(), nextKey);
+                            networkState.postValue(NetworkState.LOADED);
+                            return;
+                        }
                     }
+                    networkState.postValue(new NetworkState(NetworkState.Status.FAILED, response.message()));
                 }
-                networkState.postValue(new NetworkState(NetworkState.Status.FAILED, response.message()));
-            }
 
-            @Override
-            public void onFailure(Call<Listing> call, Throwable t) {
-                String errorMessage = t == null ? "unknown error" : t.getMessage();
-                networkState.postValue(new NetworkState(NetworkState.Status.FAILED, errorMessage));
-            }
-        });
+                @Override
+                public void onFailure(Call<Listing> call, Throwable t) {
+                    String errorMessage = t == null ? "unknown error" : t.getMessage();
+                    networkState.postValue(new NetworkState(NetworkState.Status.FAILED, errorMessage));
+                }
+            });
+        }
     }
 
     public ArrayList<List> getDummies(int itemCount) {
         ArrayList<List> lists = new ArrayList<>();
         Observable.fromCallable(() -> {
-            if (itemCount < 100)
+//            if (itemCount < 100)
                 for (int i = 0; i < 10; i++) {
                     List list = new List("100" + (itemCount + (i + 1)),
                             "100" + (itemCount + (i + 1)), "100" + (itemCount + (i + 1)));

@@ -113,18 +113,19 @@ public class ListingActivity extends AppCompatActivity {
         String password = prefs.getString(ViewModel.PASSWORD, "");
         ProgressDialog progress = ProgressDialog.show(ListingActivity.this, "", "Updating...", true);
         progress.show();
-        LiveData<Boolean> isUpdated = viewModel.updateList(list.getId(), dialogBinding.etListName.getText().toString(),
+        LiveData<String> isUpdated = viewModel.updateList(list.getId(), dialogBinding.etListName.getText().toString(),
                 dialogBinding.etDistance.getText().toString());
-        isUpdated.observe(ListingActivity.this, aBoolean -> {
-            if (aBoolean) {
+        isUpdated.observe(ListingActivity.this, s -> {
+            if (s.equals("200")) {
                 adapter.updateList(position, dialogBinding.etListName.getText().toString(),
                         dialogBinding.etDistance.getText().toString());
                 progress.dismiss();
-            } else {
+            }
+            else if (s.equals("400")) {
                 viewModel.login(username, password).observe(ListingActivity.this, login -> {
                     if (login != null && login.getStatus().getCode().equals("200")) {
-                        isUpdated.observe(ListingActivity.this, aBoolean1 -> {
-                            if (aBoolean1) {
+                        isUpdated.observe(ListingActivity.this, s1 -> {
+                            if (s1.equals("200")) {
                                 adapter.updateList(position, dialogBinding.etListName.getText().toString(),
                                         dialogBinding.etDistance.getText().toString());
                             }

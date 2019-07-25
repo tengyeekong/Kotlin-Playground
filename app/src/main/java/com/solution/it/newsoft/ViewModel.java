@@ -85,7 +85,7 @@ class ViewModel extends AndroidViewModel {
         return repository.login(username, password);
     }
 
-    public LiveData<Boolean> updateList(String id, String listName, String distance) {
+    public LiveData<String> updateList(String id, String listName, String distance) {
         if (!checkInternetConnection(getApplication())) return null;
         return repository.updateList(id, listName, distance);
     }

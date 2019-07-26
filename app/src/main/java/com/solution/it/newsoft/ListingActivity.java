@@ -105,6 +105,7 @@ public class ListingActivity extends AppCompatActivity {
                 adapter.updateList(position, dialogBinding.etListName.getText().toString(),
                         dialogBinding.etDistance.getText().toString());
             }
+            progress.dismiss();
             dialog.dismiss();
         });
     }

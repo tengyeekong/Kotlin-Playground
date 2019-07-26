@@ -47,9 +47,7 @@ public class ListingActivity extends AppCompatActivity {
 
         viewModel = ViewModelProviders.of(this).get(ViewModel.class);
         binding.swipeRefresh.setRefreshing(true);
-        viewModel.getListLiveData().observe(this, lists -> {
-            adapter.submitList(lists);
-        });
+        viewModel.getListLiveData().observe(this, lists -> adapter.submitList(lists));
         viewModel.getNetworkState().observe(this, networkState -> {
             adapter.setNetworkState(networkState);
             if (binding.swipeRefresh.isRefreshing())

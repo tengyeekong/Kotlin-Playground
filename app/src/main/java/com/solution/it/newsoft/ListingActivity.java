@@ -11,6 +11,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -86,13 +87,12 @@ public class ListingActivity extends AppCompatActivity {
         DialogUpdateListBinding dialogBinding = DialogUpdateListBinding.inflate(LayoutInflater.from(ListingActivity.this), (ViewGroup) binding.getRoot(), false);
         dialogBinding.setList(list);
 
-        dialogBinding.btnUpdate.setOnClickListener(view -> {
-            updateList(dialogBinding, list, position, dialog);
-        });
+        dialogBinding.btnUpdate.setOnClickListener(view -> updateList(dialogBinding, list, position, dialog));
         dialog.setContentView(dialogBinding.getRoot());
         dialog.show();
         Window window = dialog.getWindow();
         window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
     }
 
     private void updateList(DialogUpdateListBinding dialogBinding, List list, int position, Dialog dialog) {

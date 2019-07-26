@@ -69,8 +69,8 @@ public class ListDataSource extends PageKeyedDataSource<Long, List> {
         Observable.fromCallable(() -> {
 //            if (itemCount < 100)
             for (int i = 0; i < 10; i++) {
-                List list = new List("100" + (itemCount + (i + 1)),
-                        "100" + (itemCount + (i + 1)), "100" + (itemCount + (i + 1)));
+                List list = new List(String.valueOf(10000 + itemCount + i + 1),
+                        String.valueOf(10000 + itemCount + i + 1), String.valueOf(10000 + itemCount + i + 1));
                 lists.add(list);
             }
             return lists;

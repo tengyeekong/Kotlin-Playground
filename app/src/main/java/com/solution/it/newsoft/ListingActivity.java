@@ -45,12 +45,11 @@ public class ListingActivity extends AppCompatActivity {
         binding.recyclerView.setAdapter(adapter);
 
         viewModel = ViewModelProviders.of(this).get(ViewModel.class);
-        SharedPreferences prefs = viewModel.getPrefs();
-        refreshList(prefs);
+        refreshList();
         viewModel.getNetworkState().observe(this, networkState -> adapter.setNetworkState(networkState));
 
         binding.swipeRefresh.setColorSchemeColors(getColor(R.color.colorPrimary));
-        binding.swipeRefresh.setOnRefreshListener(() -> refreshList(prefs));
+        binding.swipeRefresh.setOnRefreshListener(() -> refreshList());
 
         adapter.setOnItemClickListener(new ListingAdapter.OnItemClickListener() {
             @Override
@@ -65,41 +64,26 @@ public class ListingActivity extends AppCompatActivity {
 
             @Override
             public void onItemLongClick(List list, int position) {
-                showUpdateDialog(list, position, prefs);
+                showUpdateDialog(list, position);
             }
         });
     }
 
-    private void refreshList(SharedPreferences prefs) {
-        String username = prefs.getString(ViewModel.USERNAME, "");
-        String password = prefs.getString(ViewModel.PASSWORD, "");
+    private void refreshList() {
         binding.swipeRefresh.setRefreshing(true);
         viewModel.getListLiveData().observe(this, lists -> {
-            if (lists == null) {
-                //can't use retrofit interceptor in this case to get new token
-                //since the token is not passing through header
-                viewModel.login(username, password).observe(this, login -> {
-                    if (login != null && login.getStatus().getCode().equals("200")) {
-                        viewModel.getListLiveData().observe(this, lists1 -> {
-                            adapter.submitList(lists1);
-                            binding.swipeRefresh.setRefreshing(false);
-                        });
-                    }
-                });
-            } else {
-                adapter.submitList(lists);
-                binding.swipeRefresh.setRefreshing(false);
-            }
+            adapter.submitList(lists);
+            binding.swipeRefresh.setRefreshing(false);
         });
     }
 
-    private void showUpdateDialog(List list, int position, SharedPreferences prefs) {
+    private void showUpdateDialog(List list, int position) {
         Dialog dialog = new Dialog(ListingActivity.this);
         DialogUpdateListBinding dialogBinding = DialogUpdateListBinding.inflate(LayoutInflater.from(ListingActivity.this), (ViewGroup) binding.getRoot(), false);
         dialogBinding.setList(list);
 
         dialogBinding.btnUpdate.setOnClickListener(view -> {
-            updateList(dialogBinding, list, position, prefs, dialog);
+            updateList(dialogBinding, list, position, dialog);
         });
         dialog.setContentView(dialogBinding.getRoot());
         dialog.show();
@@ -107,34 +91,15 @@ public class ListingActivity extends AppCompatActivity {
         window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
     }
 
-    private void updateList(DialogUpdateListBinding dialogBinding, List list, int position,
-                            SharedPreferences prefs, Dialog dialog) {
-        String username = prefs.getString(ViewModel.USERNAME, "");
-        String password = prefs.getString(ViewModel.PASSWORD, "");
+    private void updateList(DialogUpdateListBinding dialogBinding, List list, int position, Dialog dialog) {
         ProgressDialog progress = ProgressDialog.show(ListingActivity.this, "", "Updating...", true);
         progress.show();
-        LiveData<String> statusCode = viewModel.updateList(list.getId(), dialogBinding.etListName.getText().toString(),
+        LiveData<Boolean> isUpdated = viewModel.updateList(list.getId(), dialogBinding.etListName.getText().toString(),
                 dialogBinding.etDistance.getText().toString());
-        statusCode.observe(ListingActivity.this, s -> {
-            if (s != null && s.equals("200")) {
+        isUpdated.observe(ListingActivity.this, aBoolean -> {
+            if (aBoolean) {
                 adapter.updateList(position, dialogBinding.etListName.getText().toString(),
                         dialogBinding.etDistance.getText().toString());
-                progress.dismiss();
-            }
-            else if (s != null && s.equals("400")) {
-                viewModel.login(username, password).observe(ListingActivity.this, login -> {
-                    if (login != null && login.getStatus().getCode().equals("200")) {
-                        LiveData<String> statusCode1 = viewModel.updateList(list.getId(), dialogBinding.etListName.getText().toString(),
-                                dialogBinding.etDistance.getText().toString());
-                        statusCode1.observe(ListingActivity.this, s1 -> {
-                            if (s1 != null && s1.equals("200")) {
-                                adapter.updateList(position, dialogBinding.etListName.getText().toString(),
-                                        dialogBinding.etDistance.getText().toString());
-                            }
-                            progress.dismiss();
-                        });
-                    } else progress.dismiss();
-                });
             }
             dialog.dismiss();
         });

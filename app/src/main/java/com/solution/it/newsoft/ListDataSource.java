@@ -1,13 +1,8 @@
 package com.solution.it.newsoft;
 
-import android.content.SharedPreferences;
 import android.util.Log;
 
-import com.solution.it.newsoft.api.ApiService;
-import com.solution.it.newsoft.api.RetrofitClientInstance;
 import com.solution.it.newsoft.model.List;
-import com.solution.it.newsoft.model.Listing;
-import com.solution.it.newsoft.model.Login;
 import com.solution.it.newsoft.model.NetworkState;
 
 import java.util.ArrayList;
@@ -19,23 +14,17 @@ import androidx.paging.PageKeyedDataSource;
 
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 public class ListDataSource extends PageKeyedDataSource<Long, List> {
 
     private static final String TAG = ListDataSource.class.getSimpleName();
 
     private MutableLiveData networkState;
-    private ApiService service;
-    private SharedPreferences prefs;
+    private Repository repository;
 
-    public ListDataSource(SharedPreferences prefs) {
-        this.prefs = prefs;
-
+    public ListDataSource(Repository repository) {
+        this.repository = repository;
         networkState = new MutableLiveData();
-        service = RetrofitClientInstance.getRetrofitInstance().create(ApiService.class);
     }
 
 
@@ -49,67 +38,7 @@ public class ListDataSource extends PageKeyedDataSource<Long, List> {
 
         networkState.postValue(NetworkState.LOADING);
 
-        service.getListing(prefs.getString(ViewModel.ID, ""), prefs.getString(ViewModel.TOKEN, "")).enqueue(new Callback<Listing>() {
-            @Override
-            public void onResponse(Call<Listing> call, Response<Listing> response) {
-                if (response.isSuccessful()) {
-                    if (response.body().getStatus().getCode().equals("200")) {
-                        callback.onResult(response.body().getListing(), null, 2l);
-                        networkState.postValue(NetworkState.LOADED);
-                        return;
-                    }
-                    else if (response.body().getStatus().getCode().equals("400")) {
-                        String username = prefs.getString(ViewModel.USERNAME, "");
-                        String password = prefs.getString(ViewModel.PASSWORD, "");
-                        service.login(username, password).enqueue(new Callback<Login>() {
-                            @Override
-                            public void onResponse(Call<Login> call, Response<Login> response) {
-                                if (response.isSuccessful()) {
-                                    if (response.body() != null) {
-                                        if (response.body().getStatus() != null && response.body().getStatus().getCode().equals("200")) {
-                                            String id = response.body().getId();
-                                            String token = response.body().getToken();
-                                            prefs.edit().putString(ViewModel.USERNAME, username)
-                                                    .putString(ViewModel.PASSWORD, password)
-                                                    .putString(ViewModel.ID, id)
-                                                    .putString(ViewModel.TOKEN, token)
-                                                    .apply();
-
-                                            service.getListing(prefs.getString(ViewModel.ID, ""), prefs.getString(ViewModel.TOKEN, "")).enqueue(new Callback<Listing>() {
-                                                @Override
-                                                public void onResponse(Call<Listing> call, Response<Listing> response) {
-                                                    if (response.isSuccessful()) {
-                                                        if (response.body().getStatus().getCode().equals("200")) {
-                                                            callback.onResult(response.body().getListing(), null, 2l);
-                                                            networkState.postValue(NetworkState.LOADED);
-                                                            return;
-                                                        }
-                                                    }
-                                                    networkState.postValue(new NetworkState(NetworkState.Status.FAILED, response.message()));
-                                                }
-
-                                                @Override
-                                                public void onFailure(Call<Listing> call, Throwable t) {}
-                                            });
-                                        }
-                                    }
-                                }
-                            }
-
-                            @Override
-                            public void onFailure(Call<Login> call, Throwable t) {}
-                        });
-                    }
-                }
-                networkState.postValue(new NetworkState(NetworkState.Status.FAILED, response.message()));
-            }
-
-            @Override
-            public void onFailure(Call<Listing> call, Throwable t) {
-                String errorMessage = t == null ? "unknown error" : t.getMessage();
-                networkState.postValue(new NetworkState(NetworkState.Status.FAILED, errorMessage));
-            }
-        });
+        repository.getListing(callback, null, networkState, 2l);
     }
 
     @Override
@@ -131,25 +60,7 @@ public class ListDataSource extends PageKeyedDataSource<Long, List> {
             callback.onResult(getDummies(Integer.valueOf(params.key.toString()) * 10), nextKey);
             networkState.postValue(NetworkState.LOADED);
         } else {
-            service.getListing(prefs.getString(ViewModel.ID, ""), prefs.getString(ViewModel.TOKEN, "")).enqueue(new Callback<Listing>() {
-                @Override
-                public void onResponse(Call<Listing> call, Response<Listing> response) {
-                    if (response.isSuccessful()) {
-                        if (response.body().getStatus().getCode().equals("200")) {
-                            callback.onResult(response.body().getListing(), nextKey);
-                            networkState.postValue(NetworkState.LOADED);
-                            return;
-                        }
-                    }
-                    networkState.postValue(new NetworkState(NetworkState.Status.FAILED, response.message()));
-                }
-
-                @Override
-                public void onFailure(Call<Listing> call, Throwable t) {
-                    String errorMessage = t == null ? "unknown error" : t.getMessage();
-                    networkState.postValue(new NetworkState(NetworkState.Status.FAILED, errorMessage));
-                }
-            });
+            repository.getListing(null, callback, networkState, nextKey);
         }
     }
 

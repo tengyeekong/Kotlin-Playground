@@ -1,7 +1,5 @@
 package com.solution.it.newsoft;
 
-import android.content.SharedPreferences;
-
 import androidx.lifecycle.MutableLiveData;
 import androidx.paging.DataSource;
 
@@ -9,16 +7,16 @@ public class ListDataFactory extends DataSource.Factory {
 
     private MutableLiveData<ListDataSource> mutableLiveData;
     private ListDataSource feedDataSource;
-    private SharedPreferences prefs;
+    private Repository repository;
 
-    public ListDataFactory(SharedPreferences prefs) {
-        this.prefs = prefs;
+    public ListDataFactory(Repository repository) {
+        this.repository = repository;
         this.mutableLiveData = new MutableLiveData<>();
     }
 
     @Override
     public ListDataSource create() {
-        feedDataSource = new ListDataSource(prefs);
+        feedDataSource = new ListDataSource(repository);
         mutableLiveData.postValue(feedDataSource);
         return feedDataSource;
     }

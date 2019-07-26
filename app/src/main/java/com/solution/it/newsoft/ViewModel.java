@@ -9,23 +9,17 @@ import android.net.NetworkInfo;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MediatorLiveData;
 import androidx.lifecycle.Transformations;
 import androidx.paging.LivePagedListBuilder;
 import androidx.paging.PagedList;
-import io.reactivex.Observable;
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.schedulers.Schedulers;
 
 import com.solution.it.newsoft.model.List;
 import com.solution.it.newsoft.model.Login;
 import com.solution.it.newsoft.model.NetworkState;
 
-import java.util.ArrayList;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 class ViewModel extends AndroidViewModel {
     public static final String USERNAME = "username";
@@ -47,7 +41,7 @@ class ViewModel extends AndroidViewModel {
         prefs = application.getSharedPreferences(BuildConfig.APPLICATION_ID, Context.MODE_PRIVATE);
         repository = Repository.getInstance(prefs);
         executor = Executors.newFixedThreadPool(5);
-        listDataFactory = new ListDataFactory(prefs);
+        listDataFactory = new ListDataFactory(repository);
 
         networkState = Transformations.switchMap(listDataFactory.getMutableLiveData(),
                 dataSource -> dataSource.getNetworkState());
@@ -85,7 +79,7 @@ class ViewModel extends AndroidViewModel {
         return repository.login(username, password);
     }
 
-    public LiveData<String> updateList(String id, String listName, String distance) {
+    public LiveData<Boolean> updateList(String id, String listName, String distance) {
         if (!checkInternetConnection(getApplication())) return null;
         return repository.updateList(id, listName, distance);
     }

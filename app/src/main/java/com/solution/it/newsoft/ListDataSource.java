@@ -56,7 +56,7 @@ public class ListDataSource extends PageKeyedDataSource<Long, List> {
         networkState.postValue(NetworkState.LOADING);
 
         long nextKey = params.key + 1;
-        if (params.key % 2 == 0) {
+        if (params.key > 1) {
             callback.onResult(getDummies(Integer.valueOf(params.key.toString()) * 10), nextKey);
             networkState.postValue(NetworkState.LOADED);
         } else {

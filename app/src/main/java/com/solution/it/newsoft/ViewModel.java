@@ -47,11 +47,12 @@ class ViewModel extends AndroidViewModel {
                 dataSource -> dataSource.getNetworkState());
 
         pagedListConfig = (new PagedList.Config.Builder())
-                .setEnablePlaceholders(false)
+                .setPageSize(10)
                 .setInitialLoadSizeHint(10)
-                .setPageSize(10).build();
+                .setEnablePlaceholders(false)
+                .build();
 
-        listLiveData = (new LivePagedListBuilder<>(listDataFactory, pagedListConfig))
+        listLiveData = new LivePagedListBuilder<>(listDataFactory, pagedListConfig)
                 .setFetchExecutor(executor)
                 .build();
     }
@@ -61,8 +62,11 @@ class ViewModel extends AndroidViewModel {
     }
 
     public LiveData<PagedList<List>> getListLiveData() {
-        listDataFactory.reload();
         return listLiveData;
+    }
+
+    public void reload() {
+        listDataFactory.reload();
     }
 
     public SharedPreferences getPrefs() {

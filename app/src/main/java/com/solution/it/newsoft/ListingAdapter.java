@@ -34,7 +34,8 @@ public class ListingAdapter extends PagedListAdapter<List, RecyclerView.ViewHold
         @SuppressLint("DiffUtilEquals")
         @Override
         public boolean areContentsTheSame(List oldItem, List newItem) {
-            return oldItem.equals(newItem);
+            return oldItem.getList_name() != null && oldItem.getList_name().equals(newItem.getList_name())
+                    && oldItem.getDistance() != null && oldItem.getDistance().equals(newItem.getDistance());
         }
     };
 

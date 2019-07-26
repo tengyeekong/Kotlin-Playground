@@ -45,8 +45,15 @@ public class ListingActivity extends AppCompatActivity {
         binding.recyclerView.setAdapter(adapter);
 
         viewModel = ViewModelProviders.of(this).get(ViewModel.class);
-        refreshList();
-        viewModel.getNetworkState().observe(this, networkState -> adapter.setNetworkState(networkState));
+        binding.swipeRefresh.setRefreshing(true);
+        viewModel.getListLiveData().observe(this, lists -> {
+            adapter.submitList(lists);
+        });
+        viewModel.getNetworkState().observe(this, networkState -> {
+            adapter.setNetworkState(networkState);
+            if (binding.swipeRefresh.isRefreshing())
+                binding.swipeRefresh.setRefreshing(false);
+        });
 
         binding.swipeRefresh.setColorSchemeColors(getColor(R.color.colorPrimary));
         binding.swipeRefresh.setOnRefreshListener(() -> refreshList());
@@ -71,10 +78,7 @@ public class ListingActivity extends AppCompatActivity {
 
     private void refreshList() {
         binding.swipeRefresh.setRefreshing(true);
-        viewModel.getListLiveData().observe(this, lists -> {
-            adapter.submitList(lists);
-            binding.swipeRefresh.setRefreshing(false);
-        });
+        viewModel.reload();
     }
 
     private void showUpdateDialog(List list, int position) {

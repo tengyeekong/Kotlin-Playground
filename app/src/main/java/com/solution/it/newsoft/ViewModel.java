@@ -21,7 +21,7 @@ import com.solution.it.newsoft.model.NetworkState;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
-class ViewModel extends AndroidViewModel {
+public class ViewModel extends AndroidViewModel {
     public static final String USERNAME = "username";
     public static final String PASSWORD = "password";
     public static final String ID = "id";

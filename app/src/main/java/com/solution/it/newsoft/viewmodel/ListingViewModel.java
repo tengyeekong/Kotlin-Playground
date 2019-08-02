@@ -2,6 +2,7 @@ package com.solution.it.newsoft.viewmodel;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Transformations;
+import androidx.lifecycle.ViewModel;
 import androidx.paging.LivePagedListBuilder;
 import androidx.paging.PagedList;
 import io.reactivex.disposables.CompositeDisposable;
@@ -17,7 +18,7 @@ import java.util.concurrent.Executors;
 
 import javax.inject.Inject;
 
-public class ViewModel extends androidx.lifecycle.ViewModel {
+public class ListingViewModel extends ViewModel {
     public static final String USERNAME = "username";
     public static final String PASSWORD = "password";
     public static final String ID = "id";
@@ -32,7 +33,7 @@ public class ViewModel extends androidx.lifecycle.ViewModel {
     private LiveData<PagedList<List>> listLiveData;
 
     @Inject
-    public ViewModel(Repository repository, ListDataFactory listDataFactory) {
+    public ListingViewModel(Repository repository, ListDataFactory listDataFactory) {
         this.repository = repository;
         this.listDataFactory = listDataFactory;
         executor = Executors.newFixedThreadPool(5);

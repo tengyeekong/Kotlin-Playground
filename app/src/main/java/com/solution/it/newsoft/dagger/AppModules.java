@@ -5,7 +5,8 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 import com.solution.it.newsoft.BuildConfig;
-import com.solution.it.newsoft.viewmodel.ViewModelFactory;
+import com.solution.it.newsoft.viewmodel.ListingViewModel;
+import com.solution.it.newsoft.viewmodel.ListingViewModelFactory;
 import com.solution.it.newsoft.api.ApiService;
 import com.solution.it.newsoft.api.RetrofitClientInstance;
 
@@ -39,9 +40,9 @@ public abstract class AppModules {
 
     @Binds
     @IntoMap
-    @ViewModelKey(com.solution.it.newsoft.viewmodel.ViewModel.class)
-    abstract ViewModel bindUserViewModel(com.solution.it.newsoft.viewmodel.ViewModel viewModel);
+    @ViewModelKey(ListingViewModel.class)
+    abstract ViewModel bindUserViewModel(ListingViewModel listingViewModel);
 
     @Binds
-    abstract ViewModelProvider.Factory bindViewModelFactory(ViewModelFactory factory);
+    abstract ViewModelProvider.Factory bindViewModelFactory(ListingViewModelFactory factory);
 }

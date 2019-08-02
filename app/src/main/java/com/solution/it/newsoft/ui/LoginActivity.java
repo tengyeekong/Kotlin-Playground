@@ -12,14 +12,14 @@ import dagger.android.support.DaggerAppCompatActivity;
 
 import com.solution.it.newsoft.R;
 import com.solution.it.newsoft.databinding.ActivityLoginBinding;
-import com.solution.it.newsoft.viewmodel.ViewModel;
+import com.solution.it.newsoft.viewmodel.ListingViewModel;
 
 import javax.inject.Inject;
 
 public class LoginActivity extends DaggerAppCompatActivity {
 
     private ActivityLoginBinding binding;
-    private ViewModel viewModel;
+    private ListingViewModel listingViewModel;
 
     @Inject
     ViewModelProvider.Factory viewModelFactory;
@@ -29,7 +29,7 @@ public class LoginActivity extends DaggerAppCompatActivity {
         super.onCreate(savedInstanceState);
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_login);
-        viewModel = ViewModelProviders.of(this, viewModelFactory).get(ViewModel.class);
+        listingViewModel = ViewModelProviders.of(this, viewModelFactory).get(ListingViewModel.class);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(false);
         getSupportActionBar().setDisplayShowHomeEnabled(false);
@@ -41,7 +41,7 @@ public class LoginActivity extends DaggerAppCompatActivity {
             } else {
                 ProgressDialog progress = ProgressDialog.show(this, "", "Loading...", true);
                 progress.show();
-                viewModel.login(binding.etUsername.getText().toString(), binding.etPassword.getText().toString()).observe(this, login -> {
+                listingViewModel.login(binding.etUsername.getText().toString(), binding.etPassword.getText().toString()).observe(this, login -> {
                     if (login != null) {
                         if (login.getStatus() != null && login.getStatus().getCode().equals("200")) {
                             Intent intent = new Intent(LoginActivity.this, ListingActivity.class);

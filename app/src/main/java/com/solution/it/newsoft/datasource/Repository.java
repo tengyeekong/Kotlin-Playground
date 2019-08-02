@@ -12,7 +12,7 @@ import com.solution.it.newsoft.model.Listing;
 import com.solution.it.newsoft.model.Login;
 import com.solution.it.newsoft.model.NetworkState;
 import com.solution.it.newsoft.model.UpdateStatus;
-import com.solution.it.newsoft.viewmodel.ViewModel;
+import com.solution.it.newsoft.viewmodel.ListingViewModel;
 
 import java.io.IOException;
 
@@ -31,8 +31,8 @@ public class Repository {
     public Repository(ApiService service, SharedPreferences prefs) {
         this.service = service;
         this.prefs = prefs;
-        id = prefs.getString(ViewModel.ID, "");
-        token = prefs.getString(ViewModel.TOKEN, "");
+        id = prefs.getString(ListingViewModel.ID, "");
+        token = prefs.getString(ListingViewModel.TOKEN, "");
     }
 
     public void getListing(PageKeyedDataSource.LoadInitialCallback<Long, List> initCallback,
@@ -52,18 +52,18 @@ public class Repository {
             else if (listing.getStatus().getCode().equals("400")) {
                 //can't use retrofit interceptor in this case to get new token
                 //since the token is not passing through header
-                String username = prefs.getString(ViewModel.USERNAME, "");
-                String password = prefs.getString(ViewModel.PASSWORD, "");
+                String username = prefs.getString(ListingViewModel.USERNAME, "");
+                String password = prefs.getString(ListingViewModel.PASSWORD, "");
                 Call<Login> loginCall = service.login(username, password);
                 Login login = loginCall.execute().body();
                 if (login != null) {
                     if (login.getStatus() != null && login.getStatus().getCode().equals("200")) {
                         String id = login.getId();
                         String token = login.getToken();
-                        prefs.edit().putString(ViewModel.USERNAME, username)
-                                .putString(ViewModel.PASSWORD, password)
-                                .putString(ViewModel.ID, id)
-                                .putString(ViewModel.TOKEN, token)
+                        prefs.edit().putString(ListingViewModel.USERNAME, username)
+                                .putString(ListingViewModel.PASSWORD, password)
+                                .putString(ListingViewModel.ID, id)
+                                .putString(ListingViewModel.TOKEN, token)
                                 .apply();
 
                         Call<Listing> listingCall = service.getListing(id, token);
@@ -99,8 +99,8 @@ public class Repository {
 //                    else if (response.body().getStatus().getCode().equals("400")) {
 //                        //can't use retrofit interceptor in this case to get new token
 //                        //since the token is not passing through header
-//                        String username = prefs.getString(ViewModel.USERNAME, "");
-//                        String password = prefs.getString(ViewModel.PASSWORD, "");
+//                        String username = prefs.getString(ListingViewModel.USERNAME, "");
+//                        String password = prefs.getString(ListingViewModel.PASSWORD, "");
 //                        service.login(username, password).enqueue(new Callback<Login>() {
 //                            @Override
 //                            public void onResponse(Call<Login> call, Response<Login> response) {
@@ -109,10 +109,10 @@ public class Repository {
 //                                        if (response.body().getStatus() != null && response.body().getStatus().getCode().equals("200")) {
 //                                            String id = response.body().getId();
 //                                            String token = response.body().getToken();
-//                                            prefs.edit().putString(ViewModel.USERNAME, username)
-//                                                    .putString(ViewModel.PASSWORD, password)
-//                                                    .putString(ViewModel.ID, id)
-//                                                    .putString(ViewModel.TOKEN, token)
+//                                            prefs.edit().putString(ListingViewModel.USERNAME, username)
+//                                                    .putString(ListingViewModel.PASSWORD, password)
+//                                                    .putString(ListingViewModel.ID, id)
+//                                                    .putString(ListingViewModel.TOKEN, token)
 //                                                    .apply();
 //
 //                                            service.getListing(id, token).enqueue(new Callback<Listing>() {
@@ -187,10 +187,10 @@ public class Repository {
                         if (response.body().getStatus() != null && response.body().getStatus().getCode().equals("200")) {
                             id = response.body().getId();
                             token = response.body().getToken();
-                            prefs.edit().putString(ViewModel.USERNAME, username)
-                                    .putString(ViewModel.PASSWORD, password)
-                                    .putString(ViewModel.ID, id)
-                                    .putString(ViewModel.TOKEN, token)
+                            prefs.edit().putString(ListingViewModel.USERNAME, username)
+                                    .putString(ListingViewModel.PASSWORD, password)
+                                    .putString(ListingViewModel.ID, id)
+                                    .putString(ListingViewModel.TOKEN, token)
                                     .apply();
                         }
                     }
@@ -219,8 +219,8 @@ public class Repository {
                     else if (response.body().getStatus().getCode().equals("400")) {
                         //can't use retrofit interceptor in this case to get new token
                         //since the token is not passing through header
-                        String username = prefs.getString(ViewModel.USERNAME, "");
-                        String password = prefs.getString(ViewModel.PASSWORD, "");
+                        String username = prefs.getString(ListingViewModel.USERNAME, "");
+                        String password = prefs.getString(ListingViewModel.PASSWORD, "");
                         service.login(username, password).enqueue(new Callback<Login>() {
                             @Override
                             public void onResponse(Call<Login> call, Response<Login> response) {
@@ -229,10 +229,10 @@ public class Repository {
                                         if (response.body().getStatus() != null && response.body().getStatus().getCode().equals("200")) {
                                             String id = response.body().getId();
                                             String token = response.body().getToken();
-                                            prefs.edit().putString(ViewModel.USERNAME, username)
-                                                    .putString(ViewModel.PASSWORD, password)
-                                                    .putString(ViewModel.ID, id)
-                                                    .putString(ViewModel.TOKEN, token)
+                                            prefs.edit().putString(ListingViewModel.USERNAME, username)
+                                                    .putString(ListingViewModel.PASSWORD, password)
+                                                    .putString(ListingViewModel.ID, id)
+                                                    .putString(ListingViewModel.TOKEN, token)
                                                     .apply();
 
                                             service.updateList(id, token, listing_id, listing_name, distance).enqueue(new Callback<UpdateStatus>() {

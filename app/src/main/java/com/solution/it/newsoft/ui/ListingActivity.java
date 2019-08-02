@@ -26,13 +26,13 @@ import com.solution.it.newsoft.databinding.ActivityListingBinding;
 import com.solution.it.newsoft.databinding.DialogUpdateListBinding;
 import com.solution.it.newsoft.model.List;
 import com.solution.it.newsoft.paging.ListingAdapter;
-import com.solution.it.newsoft.viewmodel.ViewModel;
+import com.solution.it.newsoft.viewmodel.ListingViewModel;
 
 import javax.inject.Inject;
 
 public class ListingActivity extends DaggerAppCompatActivity {
     private ActivityListingBinding binding;
-    private ViewModel viewModel;
+    private ListingViewModel listingViewModel;
     private Toast toast;
 
     @Inject
@@ -58,10 +58,10 @@ public class ListingActivity extends DaggerAppCompatActivity {
 
         binding.recyclerView.setAdapter(adapter);
 
-        viewModel = ViewModelProviders.of(this, viewModelFactory).get(ViewModel.class);
+        listingViewModel = ViewModelProviders.of(this, viewModelFactory).get(ListingViewModel.class);
         binding.swipeRefresh.setRefreshing(true);
-        viewModel.getListLiveData().observe(this, lists -> adapter.submitList(lists));
-        viewModel.getNetworkState().observe(this, networkState -> {
+        listingViewModel.getListLiveData().observe(this, lists -> adapter.submitList(lists));
+        listingViewModel.getNetworkState().observe(this, networkState -> {
             adapter.setNetworkState(networkState);
             if (binding.swipeRefresh.isRefreshing())
                 binding.swipeRefresh.setRefreshing(false);
@@ -90,7 +90,7 @@ public class ListingActivity extends DaggerAppCompatActivity {
 
     private void refreshList() {
         binding.swipeRefresh.setRefreshing(true);
-        viewModel.reload();
+        listingViewModel.reload();
     }
 
     private void showUpdateDialog(List list, int position) {
@@ -109,7 +109,7 @@ public class ListingActivity extends DaggerAppCompatActivity {
     private void updateList(DialogUpdateListBinding dialogBinding, List list, int position, Dialog dialog) {
         ProgressDialog progress = ProgressDialog.show(ListingActivity.this, "", "Updating...", true);
         progress.show();
-        LiveData<Boolean> isUpdated = viewModel.updateList(list.getId(), dialogBinding.etListName.getText().toString(),
+        LiveData<Boolean> isUpdated = listingViewModel.updateList(list.getId(), dialogBinding.etListName.getText().toString(),
                 dialogBinding.etDistance.getText().toString());
         isUpdated.observe(ListingActivity.this, aBoolean -> {
             if (aBoolean) {

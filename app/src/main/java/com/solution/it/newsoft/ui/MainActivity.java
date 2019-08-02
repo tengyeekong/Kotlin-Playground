@@ -6,7 +6,7 @@ import android.os.Bundle;
 import android.os.Handler;
 
 import com.solution.it.newsoft.R;
-import com.solution.it.newsoft.viewmodel.ViewModel;
+import com.solution.it.newsoft.viewmodel.ListingViewModel;
 
 import javax.inject.Inject;
 
@@ -24,7 +24,7 @@ public class MainActivity extends DaggerAppCompatActivity {
         DataBindingUtil.setContentView(this, R.layout.activity_main);
 
         new Handler().postDelayed(() -> {
-            if (!prefs.getString(ViewModel.USERNAME, "").isEmpty()) {
+            if (!prefs.getString(ListingViewModel.USERNAME, "").isEmpty()) {
                 Intent intent = new Intent(MainActivity.this, ListingActivity.class);
                 startActivity(intent);
             } else {

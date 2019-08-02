@@ -5,7 +5,6 @@ import androidx.lifecycle.Transformations;
 import androidx.lifecycle.ViewModel;
 import androidx.paging.LivePagedListBuilder;
 import androidx.paging.PagedList;
-import io.reactivex.disposables.CompositeDisposable;
 
 import com.solution.it.newsoft.datasource.Repository;
 import com.solution.it.newsoft.model.List;
@@ -24,7 +23,6 @@ public class ListingViewModel extends ViewModel {
     public static final String PASSWORD = "password";
     public static final String ID = "id";
     public static final String TOKEN = "token";
-    private final CompositeDisposable disposables = new CompositeDisposable();
     private Repository repository;
 
     private ListDataFactory listDataFactory;
@@ -73,10 +71,5 @@ public class ListingViewModel extends ViewModel {
 
     public LiveData<Boolean> updateList(String id, String listName, String distance) {
         return repository.updateList(id, listName, distance);
-    }
-
-    @Override
-    protected void onCleared() {
-        disposables.clear();
     }
 }

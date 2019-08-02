@@ -59,29 +59,10 @@ public class ListDataSource extends PageKeyedDataSource<Long, List> {
         long nextKey = params.key + 1;
         int itemCount = Integer.valueOf(params.key.toString()) * 10;
         if (params.key > 1) {
-            callback.onResult(getDummies(itemCount), nextKey);
+            callback.onResult(repository.getDummies(itemCount), nextKey);
             networkState.postValue(NetworkState.LOADED);
         } else {
             repository.getListing(null, callback, networkState, nextKey);
         }
-    }
-
-    public ArrayList<List> getDummies(int itemCount) {
-        ArrayList<List> lists = new ArrayList<>();
-//        if (itemCount < 100)
-        Observable.fromCallable(() -> {
-            for (int i = 0; i < 10; i++) {
-                String value = String.valueOf(10000 + itemCount + i + 1);
-                List list = new List(value, value, value);
-                lists.add(list);
-            }
-            return lists;
-        })
-                .delay(1, TimeUnit.SECONDS)
-                .subscribeOn(AndroidSchedulers.mainThread())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe();
-
-        return lists;
     }
 }

@@ -32,6 +32,7 @@ dependencies {
     def rxjava_version = "2.2.10"
     def rxandroid_version = "2.1.1"
     def paging_version = "2.1.0"
+    def dagger_version = "2.24"
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'androidx.appcompat:appcompat:1.0.0'
@@ -53,4 +54,13 @@ dependencies {
 
     implementation "io.reactivex.rxjava2:rxjava:$rxjava_version"
     implementation "io.reactivex.rxjava2:rxandroid:$rxandroid_version"
+
+    implementation "com.google.dagger:dagger:$dagger_version"
+    annotationProcessor "com.google.dagger:dagger-compiler:$dagger_version"
+
+    implementation "com.google.dagger:dagger-android:$dagger_version"
+    implementation "com.google.dagger:dagger-android-support:$dagger_version"
+    annotationProcessor "com.google.dagger:dagger-android-processor:$dagger_version"
+
+    implementation 'org.jetbrains:annotations:15.0'
 }

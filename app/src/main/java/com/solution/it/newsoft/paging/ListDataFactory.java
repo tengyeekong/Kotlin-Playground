@@ -1,4 +1,6 @@
-package com.solution.it.newsoft;
+package com.solution.it.newsoft.paging;
+
+import com.solution.it.newsoft.Repository;
 
 import androidx.lifecycle.MutableLiveData;
 import androidx.paging.DataSource;

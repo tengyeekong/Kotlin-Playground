@@ -1,7 +1,8 @@
-package com.solution.it.newsoft;
+package com.solution.it.newsoft.paging;
 
 import android.util.Log;
 
+import com.solution.it.newsoft.Repository;
 import com.solution.it.newsoft.model.List;
 import com.solution.it.newsoft.model.NetworkState;
 
@@ -56,8 +57,9 @@ public class ListDataSource extends PageKeyedDataSource<Long, List> {
         networkState.postValue(NetworkState.LOADING);
 
         long nextKey = params.key + 1;
+        int itemCount = Integer.valueOf(params.key.toString()) * 10;
         if (params.key > 1) {
-            callback.onResult(getDummies(Integer.valueOf(params.key.toString()) * 10), nextKey);
+            callback.onResult(getDummies(itemCount), nextKey);
             networkState.postValue(NetworkState.LOADED);
         } else {
             repository.getListing(null, callback, networkState, nextKey);
@@ -66,11 +68,11 @@ public class ListDataSource extends PageKeyedDataSource<Long, List> {
 
     public ArrayList<List> getDummies(int itemCount) {
         ArrayList<List> lists = new ArrayList<>();
+//        if (itemCount < 100)
         Observable.fromCallable(() -> {
-//            if (itemCount < 100)
             for (int i = 0; i < 10; i++) {
-                List list = new List(String.valueOf(10000 + itemCount + i + 1),
-                        String.valueOf(10000 + itemCount + i + 1), String.valueOf(10000 + itemCount + i + 1));
+                String value = String.valueOf(10000 + itemCount + i + 1);
+                List list = new List(value, value, value);
                 lists.add(list);
             }
             return lists;

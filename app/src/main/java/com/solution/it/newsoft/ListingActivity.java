@@ -3,7 +3,6 @@ package com.solution.it.newsoft;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -14,21 +13,30 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import dagger.android.support.DaggerAppCompatActivity;
 
 import com.solution.it.newsoft.databinding.ActivityListingBinding;
 import com.solution.it.newsoft.databinding.DialogUpdateListBinding;
 import com.solution.it.newsoft.model.List;
+import com.solution.it.newsoft.paging.ListingAdapter;
 
-public class ListingActivity extends AppCompatActivity {
+import javax.inject.Inject;
+
+public class ListingActivity extends DaggerAppCompatActivity {
     private ActivityListingBinding binding;
-    private com.solution.it.newsoft.ViewModel viewModel;
+    private ViewModel viewModel;
     private Toast toast;
-    private ListingAdapter adapter;
+
+    @Inject
+    ViewModelProvider.Factory viewModelFactory;
+
+    @Inject
+    ListingAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,10 +50,9 @@ public class ListingActivity extends AppCompatActivity {
         binding.recyclerView.setLayoutManager(layoutManager);
         binding.recyclerView.setHasFixedSize(true);
 
-        adapter = new ListingAdapter();
         binding.recyclerView.setAdapter(adapter);
 
-        viewModel = ViewModelProviders.of(this).get(ViewModel.class);
+        viewModel = ViewModelProviders.of(this, viewModelFactory).get(ViewModel.class);
         binding.swipeRefresh.setRefreshing(true);
         viewModel.getListLiveData().observe(this, lists -> adapter.submitList(lists));
         viewModel.getNetworkState().observe(this, networkState -> {
@@ -119,7 +126,7 @@ public class ListingActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.logout:
-                viewModel.getPrefs().edit().clear().apply();
+                NewSoftApp.prefs.edit().clear().apply();
                 Intent intent = new Intent(ListingActivity.this, LoginActivity.class);
                 startActivity(intent);
                 Toast.makeText(this, "Logged out", Toast.LENGTH_SHORT).show();

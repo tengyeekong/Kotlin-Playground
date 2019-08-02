@@ -1,13 +1,5 @@
 package com.solution.it.newsoft;
 
-import android.app.Application;
-import android.content.Context;
-import android.content.SharedPreferences;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
-
-import androidx.annotation.NonNull;
-import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Transformations;
 import androidx.paging.LivePagedListBuilder;
@@ -17,18 +9,20 @@ import io.reactivex.disposables.CompositeDisposable;
 import com.solution.it.newsoft.model.List;
 import com.solution.it.newsoft.model.Login;
 import com.solution.it.newsoft.model.NetworkState;
+import com.solution.it.newsoft.paging.ListDataFactory;
 
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
-class ViewModel extends AndroidViewModel {
+import javax.inject.Inject;
+
+public class ViewModel extends androidx.lifecycle.ViewModel {
     public static final String USERNAME = "username";
     public static final String PASSWORD = "password";
     public static final String ID = "id";
     public static final String TOKEN = "token";
     private final CompositeDisposable disposables = new CompositeDisposable();
     private Repository repository;
-    private SharedPreferences prefs;
 
     private Executor executor;
     private ListDataFactory listDataFactory;
@@ -36,10 +30,9 @@ class ViewModel extends AndroidViewModel {
     private LiveData<NetworkState> networkState;
     private LiveData<PagedList<List>> listLiveData;
 
-    public ViewModel(@NonNull Application application) {
-        super(application);
-        prefs = application.getSharedPreferences(BuildConfig.APPLICATION_ID, Context.MODE_PRIVATE);
-        repository = Repository.getInstance(prefs);
+    @Inject
+    public ViewModel(Repository repository) {
+        this.repository = repository;
         executor = Executors.newFixedThreadPool(5);
         listDataFactory = new ListDataFactory(repository);
 
@@ -69,33 +62,17 @@ class ViewModel extends AndroidViewModel {
         listDataFactory.reload();
     }
 
-    public SharedPreferences getPrefs() {
-        return prefs;
-    }
-
 //    public LiveData<ArrayList<List>> getListing(String id, String token) {
 //        if (!checkInternetConnection(getApplication())) return null;
 //        return repository.getListing(id, token);
 //    }
 
     public LiveData<Login> login(String username, String password) {
-        if (!checkInternetConnection(getApplication())) return null;
         return repository.login(username, password);
     }
 
     public LiveData<Boolean> updateList(String id, String listName, String distance) {
-        if (!checkInternetConnection(getApplication())) return null;
         return repository.updateList(id, listName, distance);
-    }
-
-    public boolean checkInternetConnection(Context context) {
-        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-        if (activeNetwork != null) {
-            return true;
-        } else {
-            return false;
-        }
     }
 
     @Override

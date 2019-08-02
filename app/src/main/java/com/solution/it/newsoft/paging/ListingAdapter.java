@@ -1,4 +1,4 @@
-package com.solution.it.newsoft;
+package com.solution.it.newsoft.paging;
 
 import android.annotation.SuppressLint;
 import android.view.LayoutInflater;
@@ -15,12 +15,15 @@ import com.solution.it.newsoft.databinding.ItemProgressBinding;
 import com.solution.it.newsoft.model.List;
 import com.solution.it.newsoft.model.NetworkState;
 
+import javax.inject.Inject;
+
 public class ListingAdapter extends PagedListAdapter<List, RecyclerView.ViewHolder> {
     private static final int TYPE_PROGRESS = 0;
     private static final int TYPE_ITEM = 1;
     private NetworkState networkState;
     private OnItemClickListener listener;
 
+    @Inject
     public ListingAdapter() {
         super(DIFF_CALLBACK);
     }

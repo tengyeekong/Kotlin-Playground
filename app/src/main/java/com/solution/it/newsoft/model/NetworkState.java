@@ -8,7 +8,6 @@ public class NetworkState {
         FAILED
     }
 
-
     private final Status status;
     private final String msg;
 
@@ -21,8 +20,8 @@ public class NetworkState {
     }
 
     static {
-        LOADED=new NetworkState(Status.SUCCESS,"Success");
-        LOADING=new NetworkState(Status.RUNNING,"Running");
+        LOADED = new NetworkState(Status.SUCCESS,"Success");
+        LOADING = new NetworkState(Status.RUNNING,"Running");
     }
 
     public Status getStatus() {

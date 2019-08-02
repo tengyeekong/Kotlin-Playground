@@ -1,5 +1,7 @@
 package com.solution.it.newsoft;
 
+import android.content.SharedPreferences;
+
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.paging.PageKeyedDataSource;
@@ -21,13 +23,15 @@ import retrofit2.Response;
 
 public class Repository {
     private ApiService service;
+    private SharedPreferences prefs;
     private static String id, /*username, password,*/ token;
 
     @Inject
-    public Repository(ApiService service) {
+    public Repository(ApiService service, SharedPreferences prefs) {
         this.service = service;
-        id = NewSoftApp.prefs.getString(ViewModel.ID, "");
-        token = NewSoftApp.prefs.getString(ViewModel.TOKEN, "");
+        this.prefs = prefs;
+        id = prefs.getString(ViewModel.ID, "");
+        token = prefs.getString(ViewModel.TOKEN, "");
     }
 
     public void getListing(PageKeyedDataSource.LoadInitialCallback<Long, List> initCallback,
@@ -47,15 +51,15 @@ public class Repository {
             else if (listing.getStatus().getCode().equals("400")) {
                 //can't use retrofit interceptor in this case to get new token
                 //since the token is not passing through header
-                String username = NewSoftApp.prefs.getString(ViewModel.USERNAME, "");
-                String password = NewSoftApp.prefs.getString(ViewModel.PASSWORD, "");
+                String username = prefs.getString(ViewModel.USERNAME, "");
+                String password = prefs.getString(ViewModel.PASSWORD, "");
                 Call<Login> loginCall = service.login(username, password);
                 Login login = loginCall.execute().body();
                 if (login != null) {
                     if (login.getStatus() != null && login.getStatus().getCode().equals("200")) {
                         String id = login.getId();
                         String token = login.getToken();
-                        NewSoftApp.prefs.edit().putString(ViewModel.USERNAME, username)
+                        prefs.edit().putString(ViewModel.USERNAME, username)
                                 .putString(ViewModel.PASSWORD, password)
                                 .putString(ViewModel.ID, id)
                                 .putString(ViewModel.TOKEN, token)
@@ -182,7 +186,7 @@ public class Repository {
                         if (response.body().getStatus() != null && response.body().getStatus().getCode().equals("200")) {
                             id = response.body().getId();
                             token = response.body().getToken();
-                            NewSoftApp.prefs.edit().putString(ViewModel.USERNAME, username)
+                            prefs.edit().putString(ViewModel.USERNAME, username)
                                     .putString(ViewModel.PASSWORD, password)
                                     .putString(ViewModel.ID, id)
                                     .putString(ViewModel.TOKEN, token)
@@ -214,8 +218,8 @@ public class Repository {
                     else if (response.body().getStatus().getCode().equals("400")) {
                         //can't use retrofit interceptor in this case to get new token
                         //since the token is not passing through header
-                        String username = NewSoftApp.prefs.getString(ViewModel.USERNAME, "");
-                        String password = NewSoftApp.prefs.getString(ViewModel.PASSWORD, "");
+                        String username = prefs.getString(ViewModel.USERNAME, "");
+                        String password = prefs.getString(ViewModel.PASSWORD, "");
                         service.login(username, password).enqueue(new Callback<Login>() {
                             @Override
                             public void onResponse(Call<Login> call, Response<Login> response) {
@@ -224,7 +228,7 @@ public class Repository {
                                         if (response.body().getStatus() != null && response.body().getStatus().getCode().equals("200")) {
                                             String id = response.body().getId();
                                             String token = response.body().getToken();
-                                            NewSoftApp.prefs.edit().putString(ViewModel.USERNAME, username)
+                                            prefs.edit().putString(ViewModel.USERNAME, username)
                                                     .putString(ViewModel.PASSWORD, password)
                                                     .putString(ViewModel.ID, id)
                                                     .putString(ViewModel.TOKEN, token)

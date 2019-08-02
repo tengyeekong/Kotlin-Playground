@@ -2,28 +2,32 @@ package com.solution.it.newsoft;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelProviders;
+import dagger.android.support.DaggerAppCompatActivity;
 
 import com.solution.it.newsoft.databinding.ActivityLoginBinding;
-import com.solution.it.newsoft.databinding.ActivityMainBinding;
 
-public class LoginActivity extends AppCompatActivity {
+import javax.inject.Inject;
+
+public class LoginActivity extends DaggerAppCompatActivity {
 
     private ActivityLoginBinding binding;
     private ViewModel viewModel;
+
+    @Inject
+    ViewModelProvider.Factory viewModelFactory;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_login);
-        viewModel = ViewModelProviders.of(this).get(ViewModel.class);
+        viewModel = ViewModelProviders.of(this, viewModelFactory).get(ViewModel.class);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(false);
         getSupportActionBar().setDisplayShowHomeEnabled(false);

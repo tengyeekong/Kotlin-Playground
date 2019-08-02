@@ -3,6 +3,7 @@ package com.solution.it.newsoft;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -37,6 +38,9 @@ public class ListingActivity extends DaggerAppCompatActivity {
 
     @Inject
     ListingAdapter adapter;
+
+    @Inject
+    SharedPreferences prefs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -126,7 +130,7 @@ public class ListingActivity extends DaggerAppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.logout:
-                NewSoftApp.prefs.edit().clear().apply();
+                prefs.edit().clear().apply();
                 Intent intent = new Intent(ListingActivity.this, LoginActivity.class);
                 startActivity(intent);
                 Toast.makeText(this, "Logged out", Toast.LENGTH_SHORT).show();

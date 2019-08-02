@@ -2,6 +2,8 @@ package com.solution.it.newsoft.paging;
 
 import com.solution.it.newsoft.Repository;
 
+import javax.inject.Inject;
+
 import androidx.lifecycle.MutableLiveData;
 import androidx.paging.DataSource;
 
@@ -11,6 +13,7 @@ public class ListDataFactory extends DataSource.Factory {
     private ListDataSource feedDataSource;
     private Repository repository;
 
+    @Inject
     public ListDataFactory(Repository repository) {
         this.repository = repository;
         this.mutableLiveData = new MutableLiveData<>();

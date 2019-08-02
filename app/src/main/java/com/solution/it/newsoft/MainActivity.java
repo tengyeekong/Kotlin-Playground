@@ -1,15 +1,19 @@
 package com.solution.it.newsoft;
 
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.databinding.DataBindingUtil;
+import javax.inject.Inject;
 
-public class MainActivity extends AppCompatActivity {
+import androidx.databinding.DataBindingUtil;
+import dagger.android.support.DaggerAppCompatActivity;
+
+public class MainActivity extends DaggerAppCompatActivity {
+
+    @Inject
+    SharedPreferences prefs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -17,7 +21,6 @@ public class MainActivity extends AppCompatActivity {
         DataBindingUtil.setContentView(this, R.layout.activity_main);
 
         new Handler().postDelayed(() -> {
-            SharedPreferences prefs = getSharedPreferences(BuildConfig.APPLICATION_ID, Context.MODE_PRIVATE);
             if (!prefs.getString(ViewModel.USERNAME, "").isEmpty()) {
                 Intent intent = new Intent(MainActivity.this, ListingActivity.class);
                 startActivity(intent);

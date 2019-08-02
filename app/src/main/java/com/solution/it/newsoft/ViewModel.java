@@ -31,10 +31,10 @@ public class ViewModel extends androidx.lifecycle.ViewModel {
     private LiveData<PagedList<List>> listLiveData;
 
     @Inject
-    public ViewModel(Repository repository) {
+    public ViewModel(Repository repository, ListDataFactory listDataFactory) {
         this.repository = repository;
+        this.listDataFactory = listDataFactory;
         executor = Executors.newFixedThreadPool(5);
-        listDataFactory = new ListDataFactory(repository);
 
         networkState = Transformations.switchMap(listDataFactory.getMutableLiveData(),
                 dataSource -> dataSource.getNetworkState());
@@ -63,7 +63,6 @@ public class ViewModel extends androidx.lifecycle.ViewModel {
     }
 
 //    public LiveData<ArrayList<List>> getListing(String id, String token) {
-//        if (!checkInternetConnection(getApplication())) return null;
 //        return repository.getListing(id, token);
 //    }
 

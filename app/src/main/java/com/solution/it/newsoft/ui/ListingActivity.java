@@ -97,10 +97,12 @@ public class ListingActivity extends DaggerAppCompatActivity {
         Dialog dialog = new Dialog(ListingActivity.this);
         DialogUpdateListBinding dialogBinding = DialogUpdateListBinding.inflate(LayoutInflater.from(ListingActivity.this), (ViewGroup) binding.getRoot(), false);
         dialogBinding.setList(list);
-
+        dialogBinding.etListName.requestFocus();
         dialogBinding.btnUpdate.setOnClickListener(view -> updateList(dialogBinding, list, position, dialog));
+
         dialog.setContentView(dialogBinding.getRoot());
         dialog.show();
+
         Window window = dialog.getWindow();
         window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);

@@ -12,6 +12,7 @@ import com.solution.it.newsoft.model.List;
 import com.solution.it.newsoft.model.Login;
 import com.solution.it.newsoft.model.NetworkState;
 import com.solution.it.newsoft.paging.ListDataFactory;
+import com.solution.it.newsoft.paging.ListDataSource;
 
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -26,22 +27,20 @@ public class ListingViewModel extends ViewModel {
     private final CompositeDisposable disposables = new CompositeDisposable();
     private Repository repository;
 
-    private Executor executor;
     private ListDataFactory listDataFactory;
-    private PagedList.Config pagedListConfig;
     private LiveData<NetworkState> networkState;
     private LiveData<PagedList<List>> listLiveData;
 
     @Inject
-    public ListingViewModel(Repository repository, ListDataFactory listDataFactory) {
+    ListingViewModel(Repository repository, ListDataFactory listDataFactory) {
         this.repository = repository;
         this.listDataFactory = listDataFactory;
-        executor = Executors.newFixedThreadPool(5);
+        Executor executor = Executors.newFixedThreadPool(5);
 
         networkState = Transformations.switchMap(listDataFactory.getMutableLiveData(),
-                dataSource -> dataSource.getNetworkState());
+                ListDataSource::getNetworkState);
 
-        pagedListConfig = (new PagedList.Config.Builder())
+        PagedList.Config pagedListConfig = (new PagedList.Config.Builder())
                 .setPageSize(10)
                 .setInitialLoadSizeHint(10)
                 .setEnablePlaceholders(false)

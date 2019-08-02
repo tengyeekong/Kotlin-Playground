@@ -20,16 +20,16 @@ public class ListDataSource extends PageKeyedDataSource<Long, List> {
 
     private static final String TAG = ListDataSource.class.getSimpleName();
 
-    private MutableLiveData networkState;
+    private MutableLiveData<NetworkState> networkState;
     private Repository repository;
 
     public ListDataSource(Repository repository) {
         this.repository = repository;
-        networkState = new MutableLiveData();
+        networkState = new MutableLiveData<>();
     }
 
 
-    public MutableLiveData getNetworkState() {
+    public MutableLiveData<NetworkState> getNetworkState() {
         return networkState;
     }
 

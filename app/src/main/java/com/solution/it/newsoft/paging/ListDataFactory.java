@@ -14,7 +14,7 @@ public class ListDataFactory extends DataSource.Factory {
     private Repository repository;
 
     @Inject
-    public ListDataFactory(Repository repository) {
+    ListDataFactory(Repository repository) {
         this.repository = repository;
         this.mutableLiveData = new MutableLiveData<>();
     }

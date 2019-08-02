@@ -28,7 +28,7 @@ public class Repository {
     private static String id, /*username, password,*/ token;
 
     @Inject
-    public Repository(ApiService service, SharedPreferences prefs) {
+    Repository(ApiService service, SharedPreferences prefs) {
         this.service = service;
         this.prefs = prefs;
         id = prefs.getString(ListingViewModel.ID, "");
@@ -47,7 +47,6 @@ public class Repository {
                 else
                     afterCallback.onResult(listing.getListing(), nextKey);
                 networkState.postValue(NetworkState.LOADED);
-                return;
             }
             else if (listing.getStatus().getCode().equals("400")) {
                 //can't use retrofit interceptor in this case to get new token

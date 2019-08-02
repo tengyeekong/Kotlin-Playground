@@ -20,7 +20,7 @@ import dagger.Provides;
 import dagger.multibindings.IntoMap;
 
 @Module
-public abstract class AppModules {
+abstract class AppModules {
 
     @Singleton
     @Binds
@@ -28,13 +28,13 @@ public abstract class AppModules {
 
     @Singleton
     @Provides
-    public static SharedPreferences provideSharedPreferences(Context context) {
+    static SharedPreferences provideSharedPreferences(Context context) {
         return context.getSharedPreferences(BuildConfig.APPLICATION_ID, Context.MODE_PRIVATE);
     }
 
     @Singleton
     @Provides
-    public static ApiService provideApiService() {
+    static ApiService provideApiService() {
         return RetrofitClientInstance.getApiService();
     }
 

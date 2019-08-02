@@ -75,11 +75,7 @@ public class ListingAdapter extends PagedListAdapter<List, RecyclerView.ViewHold
     }
 
     private boolean hasExtraRow() {
-        if (networkState != null && networkState != NetworkState.LOADED) {
-            return true;
-        } else {
-            return false;
-        }
+        return networkState != null && networkState != NetworkState.LOADED;
     }
 
     @Override
@@ -112,7 +108,7 @@ public class ListingAdapter extends PagedListAdapter<List, RecyclerView.ViewHold
     class ListHolder extends RecyclerView.ViewHolder {
         ItemListBinding binding;
 
-        public ListHolder(ItemListBinding binding) {
+        ListHolder(ItemListBinding binding) {
             super(binding.getRoot());
             this.binding = binding;
 
@@ -136,12 +132,12 @@ public class ListingAdapter extends PagedListAdapter<List, RecyclerView.ViewHold
     public class LoadingHolder extends RecyclerView.ViewHolder {
 
         private ItemProgressBinding binding;
-        public LoadingHolder(ItemProgressBinding binding) {
+        LoadingHolder(ItemProgressBinding binding) {
             super(binding.getRoot());
             this.binding = binding;
         }
 
-        public void bindView(NetworkState networkState) {
+        void bindView(NetworkState networkState) {
             if (networkState != null && networkState.getStatus() == NetworkState.Status.RUNNING) {
                 binding.progressBar.setVisibility(View.VISIBLE);
             } else {

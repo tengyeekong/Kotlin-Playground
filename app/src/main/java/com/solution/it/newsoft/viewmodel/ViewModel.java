@@ -1,4 +1,4 @@
-package com.solution.it.newsoft;
+package com.solution.it.newsoft.viewmodel;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Transformations;
@@ -6,6 +6,7 @@ import androidx.paging.LivePagedListBuilder;
 import androidx.paging.PagedList;
 import io.reactivex.disposables.CompositeDisposable;
 
+import com.solution.it.newsoft.datasource.Repository;
 import com.solution.it.newsoft.model.List;
 import com.solution.it.newsoft.model.Login;
 import com.solution.it.newsoft.model.NetworkState;

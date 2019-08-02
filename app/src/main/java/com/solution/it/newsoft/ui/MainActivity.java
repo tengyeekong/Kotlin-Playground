@@ -1,9 +1,12 @@
-package com.solution.it.newsoft;
+package com.solution.it.newsoft.ui;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
+
+import com.solution.it.newsoft.R;
+import com.solution.it.newsoft.viewmodel.ViewModel;
 
 import javax.inject.Inject;
 

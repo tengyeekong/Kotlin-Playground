@@ -1,6 +1,6 @@
 package com.solution.it.newsoft.paging;
 
-import com.solution.it.newsoft.Repository;
+import com.solution.it.newsoft.datasource.Repository;
 
 import javax.inject.Inject;
 

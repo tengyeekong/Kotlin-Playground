@@ -1,4 +1,4 @@
-package com.solution.it.newsoft;
+package com.solution.it.newsoft.ui;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -10,7 +10,9 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelProviders;
 import dagger.android.support.DaggerAppCompatActivity;
 
+import com.solution.it.newsoft.R;
 import com.solution.it.newsoft.databinding.ActivityLoginBinding;
+import com.solution.it.newsoft.viewmodel.ViewModel;
 
 import javax.inject.Inject;
 

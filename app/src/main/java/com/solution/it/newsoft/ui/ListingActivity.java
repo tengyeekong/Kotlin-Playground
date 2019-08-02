@@ -1,4 +1,4 @@
-package com.solution.it.newsoft;
+package com.solution.it.newsoft.ui;
 
 import android.app.Dialog;
 import android.app.ProgressDialog;
@@ -21,10 +21,12 @@ import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import dagger.android.support.DaggerAppCompatActivity;
 
+import com.solution.it.newsoft.R;
 import com.solution.it.newsoft.databinding.ActivityListingBinding;
 import com.solution.it.newsoft.databinding.DialogUpdateListBinding;
 import com.solution.it.newsoft.model.List;
 import com.solution.it.newsoft.paging.ListingAdapter;
+import com.solution.it.newsoft.viewmodel.ViewModel;
 
 import javax.inject.Inject;
 

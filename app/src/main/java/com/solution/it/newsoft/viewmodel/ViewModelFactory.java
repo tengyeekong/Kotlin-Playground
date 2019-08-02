@@ -1,4 +1,4 @@
-package com.solution.it.newsoft;
+package com.solution.it.newsoft.viewmodel;
 
 import java.util.Map;
 

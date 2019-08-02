@@ -5,7 +5,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 import com.solution.it.newsoft.BuildConfig;
-import com.solution.it.newsoft.ViewModelFactory;
+import com.solution.it.newsoft.viewmodel.ViewModelFactory;
 import com.solution.it.newsoft.api.ApiService;
 import com.solution.it.newsoft.api.RetrofitClientInstance;
 
@@ -17,10 +17,6 @@ import dagger.Binds;
 import dagger.Module;
 import dagger.Provides;
 import dagger.multibindings.IntoMap;
-import okhttp3.OkHttpClient;
-import okhttp3.logging.HttpLoggingInterceptor;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 @Module
 public abstract class AppModules {
@@ -43,8 +39,8 @@ public abstract class AppModules {
 
     @Binds
     @IntoMap
-    @ViewModelKey(com.solution.it.newsoft.ViewModel.class)
-    abstract ViewModel bindUserViewModel(com.solution.it.newsoft.ViewModel viewModel);
+    @ViewModelKey(com.solution.it.newsoft.viewmodel.ViewModel.class)
+    abstract ViewModel bindUserViewModel(com.solution.it.newsoft.viewmodel.ViewModel viewModel);
 
     @Binds
     abstract ViewModelProvider.Factory bindViewModelFactory(ViewModelFactory factory);

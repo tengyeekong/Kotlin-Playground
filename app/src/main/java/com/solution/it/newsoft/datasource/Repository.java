@@ -1,4 +1,4 @@
-package com.solution.it.newsoft;
+package com.solution.it.newsoft.datasource;
 
 import android.content.SharedPreferences;
 
@@ -12,6 +12,7 @@ import com.solution.it.newsoft.model.Listing;
 import com.solution.it.newsoft.model.Login;
 import com.solution.it.newsoft.model.NetworkState;
 import com.solution.it.newsoft.model.UpdateStatus;
+import com.solution.it.newsoft.viewmodel.ViewModel;
 
 import java.io.IOException;
 

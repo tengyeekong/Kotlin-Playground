@@ -2,7 +2,7 @@ package com.solution.it.newsoft.paging;
 
 import android.util.Log;
 
-import com.solution.it.newsoft.Repository;
+import com.solution.it.newsoft.datasource.Repository;
 import com.solution.it.newsoft.model.List;
 import com.solution.it.newsoft.model.NetworkState;
 

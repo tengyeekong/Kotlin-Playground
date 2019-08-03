@@ -21,6 +21,7 @@ import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import dagger.android.support.DaggerAppCompatActivity;
 
+import com.google.android.material.snackbar.Snackbar;
 import com.solution.it.newsoft.R;
 import com.solution.it.newsoft.databinding.ActivityListingBinding;
 import com.solution.it.newsoft.databinding.DialogUpdateListBinding;
@@ -34,6 +35,7 @@ public class ListingActivity extends DaggerAppCompatActivity {
     private ActivityListingBinding binding;
     private ListingViewModel listingViewModel;
     private Toast toast;
+//    private Snackbar snackbar;
 
     @Inject
     ViewModelProvider.Factory viewModelFactory;
@@ -51,6 +53,7 @@ public class ListingActivity extends DaggerAppCompatActivity {
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(false);
         getSupportActionBar().setDisplayShowHomeEnabled(false);
+        getSupportActionBar().setTitle(prefs.getString(ListingViewModel.USERNAME, ""));
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         binding.recyclerView.setLayoutManager(layoutManager);
@@ -73,6 +76,12 @@ public class ListingActivity extends DaggerAppCompatActivity {
         adapter.setOnItemClickListener(new ListingAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(List list) {
+//                snackbar = Snackbar.make(binding.coordinatorLayout,
+//                        new StringBuilder("List name: ").append(list.getList_name())
+//                        .append("\n")
+//                        .append("Distance: ").append(list.getDistance()), Snackbar.LENGTH_SHORT);
+//                snackbar.show();
+
                 if (toast != null) toast.cancel();
                 toast = Toast.makeText(ListingActivity.this,
                         new StringBuilder("List name: ").append(list.getList_name())

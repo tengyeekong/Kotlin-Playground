@@ -9,18 +9,22 @@
             type="com.solution.it.newsoft.model.List" />
     </data>
 
-    <androidx.cardview.widget.CardView
+    <!--<androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginEnd="10dp"
         android:layout_marginStart="10dp"
         android:layout_marginTop="8dp"
-        android:foreground="@drawable/custom_ripple">
+        android:foreground="@drawable/custom_ripple">-->
 
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="8dp">
+            android:padding="8dp"
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp"
+            android:layout_marginTop="8dp"
+            android:foreground="@drawable/custom_ripple">
 
             <TextView
                 android:id="@+id/tv_list_name"
@@ -44,5 +48,5 @@
 
         </RelativeLayout>
 
-    </androidx.cardview.widget.CardView>
+    <!--</androidx.cardview.widget.CardView>-->
 </layout>

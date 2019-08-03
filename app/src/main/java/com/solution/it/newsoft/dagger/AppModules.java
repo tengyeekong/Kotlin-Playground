@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 import com.solution.it.newsoft.BuildConfig;
+import com.solution.it.newsoft.datasource.Repository;
 import com.solution.it.newsoft.viewmodel.ListingViewModel;
 import com.solution.it.newsoft.viewmodel.ListingViewModelFactory;
 import com.solution.it.newsoft.api.ApiService;
@@ -36,6 +37,12 @@ abstract class AppModules {
     @Provides
     static ApiService provideApiService() {
         return RetrofitClientInstance.getApiService();
+    }
+
+    @Singleton
+    @Provides
+    static Repository provideRepository(ApiService service, SharedPreferences prefs) {
+        return new Repository(service, prefs);
     }
 
     @Binds

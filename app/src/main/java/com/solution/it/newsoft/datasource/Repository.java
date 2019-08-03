@@ -1,5 +1,6 @@
 package com.solution.it.newsoft.datasource;
 
+import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
 
 import androidx.lifecycle.LiveData;
@@ -18,8 +19,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
-import javax.inject.Inject;
-
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import retrofit2.Call;
@@ -31,8 +30,7 @@ public class Repository {
     private SharedPreferences prefs;
     private static String id, /*username, password,*/ token;
 
-    @Inject
-    Repository(ApiService service, SharedPreferences prefs) {
+    public Repository(ApiService service, SharedPreferences prefs) {
         this.service = service;
         this.prefs = prefs;
         id = prefs.getString(ListingViewModel.ID, "");
@@ -89,10 +87,12 @@ public class Repository {
         }
     }
 
-    public ArrayList<List> getDummies(int itemCount) {
-        ArrayList<List> lists = new ArrayList<>();
+    @SuppressLint("CheckResult")
+    public void getDummies(int itemCount, PageKeyedDataSource.LoadCallback<Long, List> callback,
+                           MutableLiveData<NetworkState> networkState, long nextKey) {
 //        if (itemCount < 100)
         Observable.fromCallable(() -> {
+            ArrayList<List> lists = new ArrayList<>();
             for (int i = 0; i < 10; i++) {
                 String value = String.valueOf(10000 + itemCount + i + 1);
                 List list = new List(value, value, value);
@@ -103,9 +103,10 @@ public class Repository {
                 .delay(1, TimeUnit.SECONDS)
                 .subscribeOn(AndroidSchedulers.mainThread())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe();
-
-        return lists;
+                .subscribe(lists -> {
+                    callback.onResult(lists, nextKey);
+                    networkState.postValue(NetworkState.LOADED);
+                });
     }
 
 //    public LiveData<ArrayList<List>> getListing(String id, String token) {

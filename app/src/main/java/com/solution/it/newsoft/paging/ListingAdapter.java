@@ -1,6 +1,5 @@
 package com.solution.it.newsoft.paging;
 
-import android.annotation.SuppressLint;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,7 +33,6 @@ public class ListingAdapter extends PagedListAdapter<List, RecyclerView.ViewHold
             return oldItem.getId() != null && oldItem.getId().equals(newItem.getId());
         }
 
-        @SuppressLint("DiffUtilEquals")
         @Override
         public boolean areContentsTheSame(List oldItem, List newItem) {
             return oldItem.getList_name() != null && oldItem.getList_name().equals(newItem.getList_name())
@@ -45,15 +43,15 @@ public class ListingAdapter extends PagedListAdapter<List, RecyclerView.ViewHold
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        RecyclerView.ViewHolder viewHolder = null;
+        RecyclerView.ViewHolder viewHolder;
         switch (viewType) {
-            case TYPE_ITEM:
-                ItemListBinding binding = ItemListBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
-                viewHolder = new ListHolder(binding);
-                break;
             case TYPE_PROGRESS:
                 ItemProgressBinding binding2 = ItemProgressBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
                 viewHolder = new LoadingHolder(binding2);
+                break;
+            default:
+                ItemListBinding binding = ItemListBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
+                viewHolder = new ListHolder(binding);
                 break;
         }
         return viewHolder;
@@ -132,6 +130,7 @@ public class ListingAdapter extends PagedListAdapter<List, RecyclerView.ViewHold
     public class LoadingHolder extends RecyclerView.ViewHolder {
 
         private ItemProgressBinding binding;
+
         LoadingHolder(ItemProgressBinding binding) {
             super(binding.getRoot());
             this.binding = binding;

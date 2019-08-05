@@ -13,6 +13,7 @@ public class NetworkState {
 
     public static final NetworkState LOADED;
     public static final NetworkState LOADING;
+    public static final NetworkState FAILED;
 
     public NetworkState(Status status, String msg) {
         this.status = status;
@@ -22,6 +23,7 @@ public class NetworkState {
     static {
         LOADED = new NetworkState(Status.SUCCESS,"Success");
         LOADING = new NetworkState(Status.RUNNING,"Running");
+        FAILED = new NetworkState(Status.FAILED,"Failed");
     }
 
     public Status getStatus() {

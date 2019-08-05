@@ -9,10 +9,15 @@ import com.solution.it.newsoft.model.NetworkState;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.MutableLiveData;
 import androidx.paging.PageKeyedDataSource;
+import io.reactivex.Completable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 
 public class ListDataSource extends PageKeyedDataSource<Long, List> {
 
     private static final String TAG = ListDataSource.class.getSimpleName();
+    private LoadParams<Long> params;
+    private LoadCallback<Long, List> callback;
 
     private MutableLiveData<NetworkState> networkState;
     private Repository repository;
@@ -46,6 +51,9 @@ public class ListDataSource extends PageKeyedDataSource<Long, List> {
     public void loadAfter(@NonNull LoadParams<Long> params,
                           @NonNull LoadCallback<Long, List> callback) {
 
+        this.params = params;
+        this.callback = callback;
+
         Log.i(TAG, "Loading Page " + params.key + ", Count " + params.requestedLoadSize);
 
         networkState.postValue(NetworkState.LOADING);
@@ -57,5 +65,12 @@ public class ListDataSource extends PageKeyedDataSource<Long, List> {
         } else {
             repository.getListing(null, callback, networkState, nextKey);
         }
+    }
+
+    public void retry() {
+        Completable.fromAction(() -> loadAfter(params, callback))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe();
     }
 }

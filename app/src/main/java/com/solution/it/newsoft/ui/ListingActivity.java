@@ -94,6 +94,11 @@ public class ListingActivity extends DaggerAppCompatActivity {
             public void onItemLongClick(List list, int position) {
                 showUpdateDialog(list, position);
             }
+
+            @Override
+            public void onRetryClick() {
+                listingViewModel.retry();
+            }
         });
     }
 

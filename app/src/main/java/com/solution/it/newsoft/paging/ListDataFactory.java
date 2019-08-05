@@ -31,6 +31,10 @@ public class ListDataFactory extends DataSource.Factory {
             feedDataSource.invalidate();
     }
 
+    public void retry() {
+        if (feedDataSource != null)
+            feedDataSource.retry();
+    }
 
     public MutableLiveData<ListDataSource> getMutableLiveData() {
         return mutableLiveData;

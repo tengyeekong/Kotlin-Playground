@@ -19,7 +19,7 @@ import javax.inject.Inject;
 public class ListingAdapter extends PagedListAdapter<List, RecyclerView.ViewHolder> {
     private static final int TYPE_PROGRESS = 0;
     private static final int TYPE_ITEM = 1;
-    private NetworkState networkState;
+    private NetworkState networkState = NetworkState.LOADING;
     private OnItemClickListener listener;
 
     @Inject
@@ -72,13 +72,18 @@ public class ListingAdapter extends PagedListAdapter<List, RecyclerView.ViewHold
         }
     }
 
-    private boolean hasExtraRow() {
-        return networkState != null && networkState != NetworkState.LOADED;
+    private boolean hasFooter() {
+        return super.getItemCount() != 0 && networkState != NetworkState.LOADED;
     }
 
     @Override
     public int getItemViewType(int position) {
-        return (hasExtraRow() && position == getItemCount() - 1) ? TYPE_PROGRESS : TYPE_ITEM;
+        return position < super.getItemCount() ? TYPE_ITEM : TYPE_PROGRESS;
+    }
+
+    @Override
+    public int getItemCount() {
+        return super.getItemCount() + ((hasFooter()) ? 1 : 0);
     }
 
     public void updateList(int position, String listName, String distance) {
@@ -88,19 +93,8 @@ public class ListingAdapter extends PagedListAdapter<List, RecyclerView.ViewHold
     }
 
     public void setNetworkState(NetworkState newNetworkState) {
-        NetworkState previousState = this.networkState;
-        boolean previousExtraRow = hasExtraRow();
         this.networkState = newNetworkState;
-        boolean newExtraRow = hasExtraRow();
-        if (previousExtraRow != newExtraRow) {
-            if (previousExtraRow) {
-                notifyItemRemoved(getItemCount());
-            } else {
-                notifyItemInserted(getItemCount());
-            }
-        } else if (newExtraRow && previousState != newNetworkState) {
-            notifyItemChanged(getItemCount() - 1);
-        }
+        notifyItemChanged(super.getItemCount());
     }
 
     class ListHolder extends RecyclerView.ViewHolder {
@@ -144,10 +138,16 @@ public class ListingAdapter extends PagedListAdapter<List, RecyclerView.ViewHold
             }
 
             if (networkState != null && networkState.getStatus() == NetworkState.Status.FAILED) {
-                binding.errorMsg.setVisibility(View.VISIBLE);
-                binding.errorMsg.setText(networkState.getMsg());
+                binding.btnRetry.setVisibility(View.VISIBLE);
+//                binding.btnRetry.setText(networkState.getMsg());
+                binding.btnRetry.setOnClickListener(v -> {
+                    int position = getAdapterPosition();
+                    if (listener != null && position != RecyclerView.NO_POSITION) {
+                        listener.onRetryClick();
+                    }
+                });
             } else {
-                binding.errorMsg.setVisibility(View.GONE);
+                binding.btnRetry.setVisibility(View.GONE);
             }
         }
     }
@@ -156,6 +156,8 @@ public class ListingAdapter extends PagedListAdapter<List, RecyclerView.ViewHold
         void onItemClick(List list);
 
         void onItemLongClick(List list, int position);
+
+        void onRetryClick();
     }
 
     public void setOnItemClickListener(OnItemClickListener listener) {

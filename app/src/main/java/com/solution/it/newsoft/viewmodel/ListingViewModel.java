@@ -40,7 +40,7 @@ public class ListingViewModel extends ViewModel {
 
         PagedList.Config pagedListConfig = (new PagedList.Config.Builder())
                 .setPageSize(10)
-                .setInitialLoadSizeHint(10)
+                .setInitialLoadSizeHint(20)
                 .setEnablePlaceholders(false)
                 .build();
 
@@ -59,6 +59,10 @@ public class ListingViewModel extends ViewModel {
 
     public void reload() {
         listDataFactory.reload();
+    }
+
+    public void retry() {
+        listDataFactory.retry();
     }
 
 //    public LiveData<ArrayList<List>> getListing(String id, String token) {

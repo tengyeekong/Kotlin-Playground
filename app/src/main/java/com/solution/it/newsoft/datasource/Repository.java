@@ -21,6 +21,7 @@ import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -84,29 +85,30 @@ public class Repository {
             }
         } catch (IOException e) {
             e.printStackTrace();
+            networkState.postValue(NetworkState.FAILED);
         }
     }
 
     @SuppressLint("CheckResult")
     public void getDummies(int itemCount, PageKeyedDataSource.LoadCallback<Long, List> callback,
                            MutableLiveData<NetworkState> networkState, long nextKey) {
-//        if (itemCount < 100)
         Observable.fromCallable(() -> {
             ArrayList<List> lists = new ArrayList<>();
-            for (int i = 0; i < 10; i++) {
-                String value = String.valueOf(10000 + itemCount + i + 1);
+            int count = 10000 + itemCount;
+            for (int i = 0; i < 10 /*&& count < 10105*/; i++) {
+                String value = String.valueOf(++count);
                 List list = new List(value, value, value);
                 lists.add(list);
             }
             return lists;
         })
                 .delay(1, TimeUnit.SECONDS)
-                .subscribeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(lists -> {
-                    callback.onResult(lists, nextKey);
+                    if (lists.size() > 0) callback.onResult(lists, nextKey);
                     networkState.postValue(NetworkState.LOADED);
-                });
+                }, throwable -> throwable.printStackTrace());
     }
 
 //    public LiveData<ArrayList<List>> getListing(String id, String token) {

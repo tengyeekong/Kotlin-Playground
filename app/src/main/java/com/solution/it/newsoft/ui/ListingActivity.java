@@ -20,6 +20,10 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import dagger.android.support.DaggerAppCompatActivity;
+import io.reactivex.Completable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.schedulers.Schedulers;
 
 import com.google.android.material.snackbar.Snackbar;
 import com.solution.it.newsoft.R;
@@ -29,11 +33,15 @@ import com.solution.it.newsoft.model.List;
 import com.solution.it.newsoft.paging.ListingAdapter;
 import com.solution.it.newsoft.viewmodel.ListingViewModel;
 
+import java.util.concurrent.TimeUnit;
+
 import javax.inject.Inject;
 
 public class ListingActivity extends DaggerAppCompatActivity {
     private ActivityListingBinding binding;
     private ListingViewModel listingViewModel;
+    private LinearLayoutManager layoutManager;
+    private CompositeDisposable disposable = new CompositeDisposable();
     private Toast toast;
 //    private Snackbar snackbar;
 
@@ -55,7 +63,7 @@ public class ListingActivity extends DaggerAppCompatActivity {
         getSupportActionBar().setDisplayShowHomeEnabled(false);
         getSupportActionBar().setTitle(prefs.getString(ListingViewModel.USERNAME, ""));
 
-        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        layoutManager = new LinearLayoutManager(this);
         binding.recyclerView.setLayoutManager(layoutManager);
         binding.recyclerView.setHasFixedSize(true);
 
@@ -160,7 +168,22 @@ public class ListingActivity extends DaggerAppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
-        finishAffinity();
+        if (layoutManager.findFirstVisibleItemPosition() > 5) {
+            disposable.add(Completable.fromAction(() ->
+                    binding.recyclerView.smoothScrollToPosition(0))
+                    .delay(200, TimeUnit.MILLISECONDS)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(() -> layoutManager.scrollToPositionWithOffset(0, 0)));
+        } else {
+            super.onBackPressed();
+            finishAffinity();
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        disposable.clear();
+        super.onDestroy();
     }
 }

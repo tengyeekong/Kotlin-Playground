@@ -25,10 +25,10 @@ class MainActivity : DaggerAppCompatActivity() {
 
         Handler().postDelayed({
             if (prefs.getString(ListingViewModel.USERNAME, "")!!.isNotEmpty()) {
-                val intent = Intent(this@MainActivity, ListingActivity::class.java)
+                val intent = Intent(this, ListingActivity::class.java)
                 startActivity(intent)
             } else {
-                val intent = Intent(this@MainActivity, LoginActivity::class.java)
+                val intent = Intent(this, LoginActivity::class.java)
                 startActivity(intent)
             }
         }, 2000)

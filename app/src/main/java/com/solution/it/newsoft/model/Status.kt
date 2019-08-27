@@ -1,7 +1,3 @@
 package com.solution.it.newsoft.model
 
-class Status {
-
-    val code: String? = null
-    val message: String? = null
-}
+data class Status(val code: String, val message: String)

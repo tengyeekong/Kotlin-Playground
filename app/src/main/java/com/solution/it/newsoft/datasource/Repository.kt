@@ -42,9 +42,9 @@ class Repository(private val service: ApiService, private val prefs: SharedPrefe
             if (listing != null) {
                 if (listing.status!!.code == "200") {
                     if (initCallback != null)
-                        initCallback.onResult(listing.listing!!, null, nextKey)
+                        initCallback.onResult(listing.listing, null, nextKey)
                     else
-                        afterCallback?.onResult(listing.listing!!, nextKey)
+                        afterCallback?.onResult(listing.listing, nextKey)
                     networkState.postValue(NetworkState.LOADED)
                 } else if (listing.status.code == "400") {
                     //can't use retrofit interceptor in this case to get new token
@@ -63,14 +63,14 @@ class Repository(private val service: ApiService, private val prefs: SharedPrefe
                                     .putString(ListingViewModel.TOKEN, token)
                                     .apply()
 
-                            val listingCall = service.getListing(id!!, token!!)
+                            val listingCall = service.getListing(id, token)
                             val listing2 = listingCall.execute().body()
                             if (listing2 != null) {
                                 if (listing2.status!!.code == "200") {
                                     if (initCallback != null)
-                                        initCallback.onResult(listing2.listing!!, null, nextKey)
+                                        initCallback.onResult(listing2.listing, null, nextKey)
                                     else
-                                        afterCallback?.onResult(listing2.listing!!, nextKey)
+                                        afterCallback?.onResult(listing2.listing, nextKey)
                                     networkState.postValue(NetworkState.LOADED)
                                 }
                             }
@@ -136,8 +136,8 @@ class Repository(private val service: ApiService, private val prefs: SharedPrefe
                 if (response.isSuccessful) {
                     if (response.body() != null) {
                         if (response.body()!!.status != null && response.body()!!.status!!.code == "200") {
-                            id = response.body()!!.id!!
-                            token = response.body()!!.token!!
+                            id = response.body()!!.id
+                            token = response.body()!!.token
                             prefs.edit().putString(ListingViewModel.USERNAME, username)
                                     .putString(ListingViewModel.PASSWORD, password)
                                     .putString(ListingViewModel.ID, id)
@@ -183,7 +183,7 @@ class Repository(private val service: ApiService, private val prefs: SharedPrefe
                                                         .putString(ListingViewModel.TOKEN, token)
                                                         .apply()
 
-                                                service.updateList(id!!, token!!, listing_id, listing_name, distance).enqueue(object : Callback<UpdateStatus> {
+                                                service.updateList(id, token, listing_id, listing_name, distance).enqueue(object : Callback<UpdateStatus> {
                                                     override fun onResponse(call: Call<UpdateStatus>, response: Response<UpdateStatus>) {
                                                         if (response.isSuccessful) {
                                                             if (response.body() != null) {

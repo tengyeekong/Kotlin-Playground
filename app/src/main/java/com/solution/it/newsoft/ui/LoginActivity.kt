@@ -43,7 +43,7 @@ class LoginActivity : DaggerAppCompatActivity() {
                 listingViewModel.login(binding.etUsername.text.toString(), binding.etPassword.text.toString()).observe(this, Observer { login ->
                     if (login != null) {
                         if (!(login.status == null || login.status.code != "200")) {
-                            val intent = Intent(this@LoginActivity, ListingActivity::class.java)
+                            val intent = Intent(this, ListingActivity::class.java)
                             startActivity(intent)
                         }
                         if (login.status != null)

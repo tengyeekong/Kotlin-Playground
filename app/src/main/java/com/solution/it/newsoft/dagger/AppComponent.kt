@@ -2,8 +2,6 @@ package com.solution.it.newsoft.dagger
 
 import android.app.Application
 
-import com.solution.it.newsoft.NewSoftApp
-
 import javax.inject.Singleton
 
 import dagger.BindsInstance

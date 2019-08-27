@@ -40,8 +40,8 @@ class ListingActivity : DaggerAppCompatActivity() {
     private lateinit var listingViewModel: ListingViewModel
     private lateinit var layoutManager: LinearLayoutManager
     private val disposable = CompositeDisposable()
-    private var toast: Toast? = null
-    //    private Snackbar snackbar;
+//    private var toast: Toast? = null
+    private var snackbar: Snackbar? = null
 
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
@@ -80,18 +80,18 @@ class ListingActivity : DaggerAppCompatActivity() {
 
         adapter.setOnItemClickListener(object : ListingAdapter.OnItemClickListener {
             override fun onItemClick(list: List) {
-                //                snackbar = Snackbar.make(binding.coordinatorLayout,
-                //                        new StringBuilder("List name: ").append(list.getList_name())
-                //                        .append("\n")
-                //                        .append("Distance: ").append(list.getDistance()), Snackbar.LENGTH_SHORT);
-                //                snackbar.show();
-
-                if (toast != null) toast!!.cancel()
-                toast = Toast.makeText(this@ListingActivity,
+                snackbar = Snackbar.make(binding.coordinatorLayout,
                         StringBuilder("List name: ").append(list.list_name)
-                                .append("\n")
-                                .append("Distance: ").append(list.distance), Toast.LENGTH_SHORT)
-                toast!!.show()
+                        .append("\n")
+                        .append("Distance: ").append(list.distance), Snackbar.LENGTH_SHORT);
+                snackbar?.show()
+
+//                if (toast != null) toast!!.cancel()
+//                toast = Toast.makeText(this@ListingActivity,
+//                        StringBuilder("List name: ").append(list.list_name)
+//                                .append("\n")
+//                                .append("Distance: ").append(list.distance), Toast.LENGTH_SHORT)
+//                toast?.show()
             }
 
             override fun onItemLongClick(list: List, position: Int) {
@@ -110,8 +110,8 @@ class ListingActivity : DaggerAppCompatActivity() {
     }
 
     private fun showUpdateDialog(list: List, position: Int) {
-        val dialog = Dialog(this@ListingActivity)
-        val dialogBinding = DialogUpdateListBinding.inflate(LayoutInflater.from(this@ListingActivity), binding.root as ViewGroup, false)
+        val dialog = Dialog(this)
+        val dialogBinding = DialogUpdateListBinding.inflate(LayoutInflater.from(this), binding.root as ViewGroup, false)
         dialogBinding.list = list
         dialogBinding.etListName.requestFocus()
         dialogBinding.btnUpdate.setOnClickListener { updateList(dialogBinding, list, position, dialog) }
@@ -125,11 +125,11 @@ class ListingActivity : DaggerAppCompatActivity() {
     }
 
     private fun updateList(dialogBinding: DialogUpdateListBinding, list: List, position: Int, dialog: Dialog) {
-        val progress = ProgressDialog.show(this@ListingActivity, "", "Updating...", true)
+        val progress = ProgressDialog.show(this, "", "Updating...", true)
         progress.show()
-        val isUpdated = listingViewModel.updateList(list.id!!, dialogBinding.etListName.text.toString(),
+        val isUpdated = listingViewModel.updateList(list.id, dialogBinding.etListName.text.toString(),
                 dialogBinding.etDistance.text.toString())
-        isUpdated.observe(this@ListingActivity, Observer { aBoolean ->
+        isUpdated.observe(this, Observer { aBoolean ->
             if (aBoolean!!) {
                 adapter.updateList(position, dialogBinding.etListName.text.toString(),
                         dialogBinding.etDistance.text.toString())
@@ -149,7 +149,7 @@ class ListingActivity : DaggerAppCompatActivity() {
         return when (item.itemId) {
             R.id.logout -> {
                 prefs.edit().clear().apply()
-                val intent = Intent(this@ListingActivity, LoginActivity::class.java)
+                val intent = Intent(this, LoginActivity::class.java)
                 startActivity(intent)
                 Toast.makeText(this, "Logged out", Toast.LENGTH_SHORT).show()
                 true

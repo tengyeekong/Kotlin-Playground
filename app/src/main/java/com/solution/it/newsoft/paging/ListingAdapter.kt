@@ -21,14 +21,14 @@ constructor() : PagedListAdapter<List, RecyclerView.ViewHolder>(DIFF_CALLBACK) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val viewHolder: RecyclerView.ViewHolder
-        when (viewType) {
+        viewHolder = when (viewType) {
             TYPE_PROGRESS -> {
                 val binding2 = ItemProgressBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-                viewHolder = LoadingHolder(binding2)
+                LoadingHolder(binding2)
             }
             else -> {
                 val binding = ItemListBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-                viewHolder = ListHolder(binding)
+                ListHolder(binding)
             }
         }
         return viewHolder
@@ -70,15 +70,14 @@ constructor() : PagedListAdapter<List, RecyclerView.ViewHolder>(DIFF_CALLBACK) {
     internal inner class ListHolder(var binding: ItemListBinding) : RecyclerView.ViewHolder(binding.root) {
 
         init {
-
-            itemView.setOnClickListener { _ ->
+            itemView.setOnClickListener {
                 val position = adapterPosition
                 if (listener != null && position != RecyclerView.NO_POSITION) {
                     getItem(position)?.let { listener!!.onItemClick(it) }
                 }
             }
 
-            itemView.setOnLongClickListener { _ ->
+            itemView.setOnLongClickListener {
                 val position = adapterPosition
                 if (listener != null && position != RecyclerView.NO_POSITION) {
                     getItem(position)?.let { listener!!.onItemLongClick(it, position) }
@@ -91,7 +90,7 @@ constructor() : PagedListAdapter<List, RecyclerView.ViewHolder>(DIFF_CALLBACK) {
     inner class LoadingHolder internal constructor(private val binding: ItemProgressBinding) : RecyclerView.ViewHolder(binding.root) {
 
         internal fun bindView(networkState: NetworkState?) {
-            if (networkState != null && networkState.status == NetworkState.Status.RUNNING) {
+            if (!(networkState == null || networkState.status != NetworkState.Status.RUNNING)) {
                 binding.progressBar.visibility = View.VISIBLE
             } else {
                 binding.progressBar.visibility = View.GONE
@@ -99,8 +98,8 @@ constructor() : PagedListAdapter<List, RecyclerView.ViewHolder>(DIFF_CALLBACK) {
 
             if (networkState != null && networkState.status == NetworkState.Status.FAILED) {
                 binding.btnRetry.visibility = View.VISIBLE
-                //                binding.btnRetry.setText(networkState.getMsg());
-                binding.btnRetry.setOnClickListener { v ->
+//                binding.btnRetry.setText(networkState.getMsg());
+                binding.btnRetry.setOnClickListener {
                     val position = adapterPosition
                     if (listener != null && position != RecyclerView.NO_POSITION) {
                         listener!!.onRetryClick()
@@ -125,17 +124,16 @@ constructor() : PagedListAdapter<List, RecyclerView.ViewHolder>(DIFF_CALLBACK) {
     }
 
     companion object {
-        private val TYPE_PROGRESS = 0
-        private val TYPE_ITEM = 1
+        private const val TYPE_PROGRESS = 0
+        private const val TYPE_ITEM = 1
 
         private val DIFF_CALLBACK = object : DiffUtil.ItemCallback<List>() {
             override fun areItemsTheSame(oldItem: List, newItem: List): Boolean {
-                return oldItem.id != null && oldItem.id == newItem.id
+                return oldItem.id == newItem.id
             }
 
             override fun areContentsTheSame(oldItem: List, newItem: List): Boolean {
-                return (oldItem.list_name != null && oldItem.list_name == newItem.list_name
-                        && oldItem.distance != null && oldItem.distance == newItem.distance)
+                return (oldItem.list_name == newItem.list_name && oldItem.distance == newItem.distance)
             }
         }
     }

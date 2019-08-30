@@ -41,16 +41,11 @@ class ListingActivity : DaggerAppCompatActivity() {
     private lateinit var layoutManager: LinearLayoutManager
     private val disposable = CompositeDisposable()
 //    private var toast: Toast? = null
-    private var snackbar: Snackbar? = null
+    private lateinit var snackbar: Snackbar
 
-    @Inject
-    lateinit var viewModelFactory: ViewModelProvider.Factory
-
-    @Inject
-    lateinit var adapter: ListingAdapter
-
-    @Inject
-    lateinit var prefs: SharedPreferences
+    @Inject lateinit var viewModelFactory: ViewModelProvider.Factory
+    @Inject lateinit var adapter: ListingAdapter
+    @Inject lateinit var prefs: SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -84,7 +79,7 @@ class ListingActivity : DaggerAppCompatActivity() {
                         StringBuilder("List name: ").append(list.list_name)
                         .append("\n")
                         .append("Distance: ").append(list.distance), Snackbar.LENGTH_SHORT);
-                snackbar?.show()
+                snackbar.show()
 
 //                if (toast != null) toast!!.cancel()
 //                toast = Toast.makeText(this@ListingActivity,
@@ -120,8 +115,8 @@ class ListingActivity : DaggerAppCompatActivity() {
         dialog.show()
 
         val window = dialog.window
-        window!!.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
-        window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
+        window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+        window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
     }
 
     private fun updateList(dialogBinding: DialogUpdateListBinding, list: List, position: Int, dialog: Dialog) {
@@ -130,7 +125,7 @@ class ListingActivity : DaggerAppCompatActivity() {
         val isUpdated = listingViewModel.updateList(list.id, dialogBinding.etListName.text.toString(),
                 dialogBinding.etDistance.text.toString())
         isUpdated.observe(this, Observer { aBoolean ->
-            if (aBoolean!!) {
+            if (aBoolean) {
                 adapter.updateList(position, dialogBinding.etListName.text.toString(),
                         dialogBinding.etDistance.text.toString())
             }

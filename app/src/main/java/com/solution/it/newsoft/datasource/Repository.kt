@@ -29,8 +29,8 @@ import retrofit2.Response
 class Repository(private val service: ApiService, private val prefs: SharedPreferences) {
 
     init {
-        id = prefs.getString(ListingViewModel.ID, "")
-        token = prefs.getString(ListingViewModel.TOKEN, "")
+        id = prefs.getString(ListingViewModel.ID, "") ?: ""
+        token = prefs.getString(ListingViewModel.TOKEN, "") ?: ""
     }
 
     fun getListing(initCallback: PageKeyedDataSource.LoadInitialCallback<Long, List>?,
@@ -40,21 +40,21 @@ class Repository(private val service: ApiService, private val prefs: SharedPrefe
         try {
             val listing = call.execute().body()
             if (listing != null) {
-                if (listing.status!!.code == "200") {
+                if (listing.status?.code == "200") {
                     if (initCallback != null)
                         initCallback.onResult(listing.listing, null, nextKey)
                     else
                         afterCallback?.onResult(listing.listing, nextKey)
                     networkState.postValue(NetworkState.LOADED)
-                } else if (listing.status.code == "400") {
+                } else if (listing.status?.code == "400") {
                     //can't use retrofit interceptor in this case to get new token
                     //since the token is not passing through header
-                    val username = prefs.getString(ListingViewModel.USERNAME, "")
-                    val password = prefs.getString(ListingViewModel.PASSWORD, "")
-                    val loginCall = service.login(username!!, password!!)
+                    val username = prefs.getString(ListingViewModel.USERNAME, "") ?: ""
+                    val password = prefs.getString(ListingViewModel.PASSWORD, "") ?: ""
+                    val loginCall = service.login(username, password)
                     val login = loginCall.execute().body()
                     if (login != null) {
-                        if (login.status != null && login.status.code == "200") {
+                        if (login.status?.code == "200") {
                             val id = login.id
                             val token = login.token
                             prefs.edit().putString(ListingViewModel.USERNAME, username)
@@ -66,7 +66,7 @@ class Repository(private val service: ApiService, private val prefs: SharedPrefe
                             val listingCall = service.getListing(id, token)
                             val listing2 = listingCall.execute().body()
                             if (listing2 != null) {
-                                if (listing2.status!!.code == "200") {
+                                if (listing2.status?.code == "200") {
                                     if (initCallback != null)
                                         initCallback.onResult(listing2.listing, null, nextKey)
                                     else
@@ -134,18 +134,17 @@ class Repository(private val service: ApiService, private val prefs: SharedPrefe
         service.login(username, password).enqueue(object : Callback<Login> {
             override fun onResponse(call: Call<Login>, response: Response<Login>) {
                 if (response.isSuccessful) {
-                    if (response.body() != null) {
-                        if (response.body()!!.status != null && response.body()!!.status!!.code == "200") {
-                            id = response.body()!!.id
-                            token = response.body()!!.token
-                            prefs.edit().putString(ListingViewModel.USERNAME, username)
-                                    .putString(ListingViewModel.PASSWORD, password)
-                                    .putString(ListingViewModel.ID, id)
-                                    .putString(ListingViewModel.TOKEN, token)
-                                    .apply()
-                        }
+                    val responseBody = response.body()
+                    if (responseBody?.status?.code == "200") {
+                        id = responseBody.id
+                        token = responseBody.token
+                        prefs.edit().putString(ListingViewModel.USERNAME, username)
+                                .putString(ListingViewModel.PASSWORD, password)
+                                .putString(ListingViewModel.ID, id)
+                                .putString(ListingViewModel.TOKEN, token)
+                                .apply()
                     }
-                    loginData.value = response.body()
+                    loginData.value = responseBody
                 }
             }
 
@@ -161,22 +160,24 @@ class Repository(private val service: ApiService, private val prefs: SharedPrefe
         service.updateList(id, token, listing_id, listing_name, distance).enqueue(object : Callback<UpdateStatus> {
             override fun onResponse(call: Call<UpdateStatus>, response: Response<UpdateStatus>) {
                 if (response.isSuccessful) {
-                    if (response.body() != null) {
-                        if (response.body()!!.status!!.code == "200") {
+                    val responseBody = response.body()
+                    if (responseBody != null) {
+                        if (responseBody.status?.code == "200") {
                             isUpdated.value = true
                             return
-                        } else if (response.body()!!.status!!.code == "400") {
+                        } else if (responseBody.status?.code == "400") {
                             //can't use retrofit interceptor in this case to get new token
                             //since the token is not passing through header
-                            val username = prefs.getString(ListingViewModel.USERNAME, "")
-                            val password = prefs.getString(ListingViewModel.PASSWORD, "")
-                            service.login(username!!, password!!).enqueue(object : Callback<Login> {
+                            val username = prefs.getString(ListingViewModel.USERNAME, "") ?: ""
+                            val password = prefs.getString(ListingViewModel.PASSWORD, "") ?: ""
+                            service.login(username, password).enqueue(object : Callback<Login> {
                                 override fun onResponse(call: Call<Login>, response: Response<Login>) {
                                     if (response.isSuccessful) {
-                                        if (response.body() != null) {
-                                            if (response.body()!!.status != null && response.body()!!.status!!.code == "200") {
-                                                val id = response.body()!!.id
-                                                val token = response.body()!!.token
+                                        val responseBody = response.body()
+                                        if (responseBody != null) {
+                                            if (responseBody.status != null && responseBody.status?.code == "200") {
+                                                val id = responseBody.id
+                                                val token = responseBody.token
                                                 prefs.edit().putString(ListingViewModel.USERNAME, username)
                                                         .putString(ListingViewModel.PASSWORD, password)
                                                         .putString(ListingViewModel.ID, id)
@@ -187,7 +188,7 @@ class Repository(private val service: ApiService, private val prefs: SharedPrefe
                                                     override fun onResponse(call: Call<UpdateStatus>, response: Response<UpdateStatus>) {
                                                         if (response.isSuccessful) {
                                                             if (response.body() != null) {
-                                                                if (response.body()!!.status!!.code == "200") {
+                                                                if (response.body()?.status?.code == "200") {
                                                                     isUpdated.value = true
                                                                     return
                                                                 }

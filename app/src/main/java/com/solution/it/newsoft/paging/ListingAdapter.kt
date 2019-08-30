@@ -57,8 +57,8 @@ constructor() : PagedListAdapter<List, RecyclerView.ViewHolder>(DIFF_CALLBACK) {
     }
 
     fun updateList(position: Int, listName: String, distance: String) {
-        currentList!![position]!!.list_name = listName
-        currentList!![position]!!.distance = distance
+        currentList?.get(position)?.list_name = listName
+        currentList?.get(position)?.distance = distance
         notifyItemChanged(position)
     }
 
@@ -72,15 +72,15 @@ constructor() : PagedListAdapter<List, RecyclerView.ViewHolder>(DIFF_CALLBACK) {
         init {
             itemView.setOnClickListener {
                 val position = adapterPosition
-                if (listener != null && position != RecyclerView.NO_POSITION) {
-                    getItem(position)?.let { listener!!.onItemClick(it) }
+                if (position != RecyclerView.NO_POSITION) {
+                    getItem(position)?.let { listener?.onItemClick(it) }
                 }
             }
 
             itemView.setOnLongClickListener {
                 val position = adapterPosition
-                if (listener != null && position != RecyclerView.NO_POSITION) {
-                    getItem(position)?.let { listener!!.onItemLongClick(it, position) }
+                if (position != RecyclerView.NO_POSITION) {
+                    getItem(position)?.let { listener?.onItemLongClick(it, position) }
                 }
                 true
             }
@@ -101,8 +101,8 @@ constructor() : PagedListAdapter<List, RecyclerView.ViewHolder>(DIFF_CALLBACK) {
 //                binding.btnRetry.setText(networkState.getMsg());
                 binding.btnRetry.setOnClickListener {
                     val position = adapterPosition
-                    if (listener != null && position != RecyclerView.NO_POSITION) {
-                        listener!!.onRetryClick()
+                    if (position != RecyclerView.NO_POSITION) {
+                        listener?.onRetryClick()
                     }
                 }
             } else {

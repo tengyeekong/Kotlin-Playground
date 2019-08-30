@@ -16,15 +16,14 @@ import dagger.android.support.DaggerAppCompatActivity
 
 class MainActivity : DaggerAppCompatActivity() {
 
-    @Inject
-    lateinit var prefs: SharedPreferences
+    @Inject lateinit var prefs: SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         DataBindingUtil.setContentView<ViewDataBinding>(this, R.layout.activity_main)
 
         Handler().postDelayed({
-            if (prefs.getString(ListingViewModel.USERNAME, "")!!.isNotEmpty()) {
+            if (!prefs.getString(ListingViewModel.USERNAME, "").isNullOrEmpty()) {
                 val intent = Intent(this, ListingActivity::class.java)
                 startActivity(intent)
             } else {

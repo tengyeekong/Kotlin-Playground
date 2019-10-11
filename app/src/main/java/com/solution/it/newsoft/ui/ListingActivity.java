@@ -1,10 +1,10 @@
 package com.solution.it.newsoft.ui;
 
 import android.app.Dialog;
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -25,6 +25,11 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 
+import com.github.razir.progressbutton.ButtonTextAnimatorExtensionsKt;
+import com.github.razir.progressbutton.DrawableButtonExtensionsKt;
+import com.github.razir.progressbutton.ProgressButtonHolderKt;
+import com.github.razir.progressbutton.ProgressParams;
+import com.github.razir.progressbutton.TextChangeAnimatorParams;
 import com.google.android.material.snackbar.Snackbar;
 import com.solution.it.newsoft.R;
 import com.solution.it.newsoft.databinding.ActivityListingBinding;
@@ -42,8 +47,8 @@ public class ListingActivity extends DaggerAppCompatActivity {
     private ListingViewModel listingViewModel;
     private LinearLayoutManager layoutManager;
     private CompositeDisposable disposable = new CompositeDisposable();
-    private Toast toast;
-//    private Snackbar snackbar;
+//    private Toast toast;
+    private Snackbar snackbar;
 
     @Inject
     ViewModelProvider.Factory viewModelFactory;
@@ -84,18 +89,18 @@ public class ListingActivity extends DaggerAppCompatActivity {
         adapter.setOnItemClickListener(new ListingAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(List list) {
-//                snackbar = Snackbar.make(binding.coordinatorLayout,
-//                        new StringBuilder("List name: ").append(list.getList_name())
-//                        .append("\n")
-//                        .append("Distance: ").append(list.getDistance()), Snackbar.LENGTH_SHORT);
-//                snackbar.show();
-
-                if (toast != null) toast.cancel();
-                toast = Toast.makeText(ListingActivity.this,
+                snackbar = Snackbar.make(binding.coordinatorLayout,
                         new StringBuilder("List name: ").append(list.getList_name())
-                                .append("\n")
-                                .append("Distance: ").append(list.getDistance()), Toast.LENGTH_SHORT);
-                toast.show();
+                        .append("\n")
+                        .append("Distance: ").append(list.getDistance()), Snackbar.LENGTH_SHORT);
+                snackbar.show();
+
+//                if (toast != null) toast.cancel();
+//                toast = Toast.makeText(ListingActivity.this,
+//                        new StringBuilder("List name: ").append(list.getList_name())
+//                                .append("\n")
+//                                .append("Distance: ").append(list.getDistance()), Toast.LENGTH_SHORT);
+//                toast.show();
             }
 
             @Override
@@ -126,13 +131,20 @@ public class ListingActivity extends DaggerAppCompatActivity {
         dialog.show();
 
         Window window = dialog.getWindow();
-        window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+        if (window != null) {
+            window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+        }
     }
 
     private void updateList(DialogUpdateListBinding dialogBinding, List list, int position, Dialog dialog) {
-        ProgressDialog progress = ProgressDialog.show(ListingActivity.this, "", "Updating...", true);
-        progress.show();
+        ProgressButtonHolderKt.bindProgressButton(this, dialogBinding.btnUpdate);
+        ButtonTextAnimatorExtensionsKt.attachTextChangeAnimator(dialogBinding.btnUpdate, new TextChangeAnimatorParams());
+        ProgressParams params = new ProgressParams();
+        params.setButtonText("Updating");
+        params.setProgressColorRes(R.color.colorPrimary);
+        DrawableButtonExtensionsKt.showProgress(dialogBinding.btnUpdate, params);
+
         LiveData<Boolean> isUpdated = listingViewModel.updateList(list.getId(), dialogBinding.etListName.getText().toString(),
                 dialogBinding.etDistance.getText().toString());
         isUpdated.observe(ListingActivity.this, aBoolean -> {
@@ -140,8 +152,9 @@ public class ListingActivity extends DaggerAppCompatActivity {
                 adapter.updateList(position, dialogBinding.etListName.getText().toString(),
                         dialogBinding.etDistance.getText().toString());
             }
-            progress.dismiss();
-            dialog.dismiss();
+            DrawableButtonExtensionsKt.hideProgress(dialogBinding.btnUpdate, "Updated");
+            final Handler handler = new Handler();
+            handler.postDelayed(dialog::dismiss, 1_000);
         });
     }
 
@@ -154,16 +167,14 @@ public class ListingActivity extends DaggerAppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.logout:
-                prefs.edit().clear().apply();
-                Intent intent = new Intent(ListingActivity.this, LoginActivity.class);
-                startActivity(intent);
-                Toast.makeText(this, "Logged out", Toast.LENGTH_SHORT).show();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
+        if (item.getItemId() == R.id.logout) {
+            prefs.edit().clear().apply();
+            Intent intent = new Intent(ListingActivity.this, LoginActivity.class);
+            startActivity(intent);
+            Toast.makeText(this, "Logged out", Toast.LENGTH_SHORT).show();
+            return true;
         }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override

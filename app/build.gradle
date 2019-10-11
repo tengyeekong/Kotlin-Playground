@@ -63,4 +63,6 @@ dependencies {
     annotationProcessor "com.google.dagger:dagger-android-processor:$dagger_version"
 
     implementation 'org.jetbrains:annotations:17.0.0'
+
+    implementation 'com.github.razir.progressbutton:progressbutton:1.0.3'
 }

@@ -1,7 +1,6 @@
 package com.solution.it.newsoft.ui
 
 import android.app.Dialog
-import android.app.ProgressDialog
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
@@ -17,6 +16,10 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.github.razir.progressbutton.attachTextChangeAnimator
+import com.github.razir.progressbutton.bindProgressButton
+import com.github.razir.progressbutton.hideProgress
+import com.github.razir.progressbutton.showProgress
 import dagger.android.support.DaggerAppCompatActivity
 import io.reactivex.Completable
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -30,8 +33,10 @@ import com.solution.it.newsoft.databinding.DialogUpdateListBinding
 import com.solution.it.newsoft.model.List
 import com.solution.it.newsoft.paging.ListingAdapter
 import com.solution.it.newsoft.viewmodel.ListingViewModel
+import java.util.*
 
 import java.util.concurrent.TimeUnit
+import kotlin.concurrent.schedule
 
 import javax.inject.Inject
 
@@ -40,12 +45,15 @@ class ListingActivity : DaggerAppCompatActivity() {
     private lateinit var listingViewModel: ListingViewModel
     private lateinit var layoutManager: LinearLayoutManager
     private val disposable = CompositeDisposable()
-//    private var toast: Toast? = null
+    //    private var toast: Toast? = null
     private lateinit var snackbar: Snackbar
 
-    @Inject lateinit var viewModelFactory: ViewModelProvider.Factory
-    @Inject lateinit var adapter: ListingAdapter
-    @Inject lateinit var prefs: SharedPreferences
+    @Inject
+    lateinit var viewModelFactory: ViewModelProvider.Factory
+    @Inject
+    lateinit var adapter: ListingAdapter
+    @Inject
+    lateinit var prefs: SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -77,8 +85,8 @@ class ListingActivity : DaggerAppCompatActivity() {
             override fun onItemClick(list: List) {
                 snackbar = Snackbar.make(binding.coordinatorLayout,
                         StringBuilder("List name: ").append(list.list_name)
-                        .append("\n")
-                        .append("Distance: ").append(list.distance), Snackbar.LENGTH_SHORT);
+                                .append("\n")
+                                .append("Distance: ").append(list.distance), Snackbar.LENGTH_SHORT);
                 snackbar.show()
 
 //                if (toast != null) toast!!.cancel()
@@ -120,8 +128,13 @@ class ListingActivity : DaggerAppCompatActivity() {
     }
 
     private fun updateList(dialogBinding: DialogUpdateListBinding, list: List, position: Int, dialog: Dialog) {
-        val progress = ProgressDialog.show(this, "", "Updating...", true)
-        progress.show()
+        bindProgressButton(dialogBinding.btnUpdate)
+        dialogBinding.btnUpdate.attachTextChangeAnimator()
+        dialogBinding.btnUpdate.showProgress {
+            buttonText = "Updating"
+            progressColorRes = R.color.colorPrimary
+        }
+
         val isUpdated = listingViewModel.updateList(list.id, dialogBinding.etListName.text.toString(),
                 dialogBinding.etDistance.text.toString())
         isUpdated.observe(this, Observer { aBoolean ->
@@ -129,8 +142,10 @@ class ListingActivity : DaggerAppCompatActivity() {
                 adapter.updateList(position, dialogBinding.etListName.text.toString(),
                         dialogBinding.etDistance.text.toString())
             }
-            progress.dismiss()
-            dialog.dismiss()
+            dialogBinding.btnUpdate.hideProgress("Updated")
+            Timer().schedule(1_000) {
+                dialog.dismiss()
+            }
         })
     }
 

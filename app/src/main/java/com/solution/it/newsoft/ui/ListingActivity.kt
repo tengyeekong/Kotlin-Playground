@@ -10,17 +10,16 @@ import android.view.MenuItem
 import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.github.razir.progressbutton.attachTextChangeAnimator
 import com.github.razir.progressbutton.bindProgressButton
 import com.github.razir.progressbutton.hideProgress
 import com.github.razir.progressbutton.showProgress
-import dagger.android.support.DaggerAppCompatActivity
 import io.reactivex.Completable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -33,27 +32,23 @@ import com.solution.it.newsoft.databinding.DialogUpdateListBinding
 import com.solution.it.newsoft.model.List
 import com.solution.it.newsoft.paging.ListingAdapter
 import com.solution.it.newsoft.viewmodel.ListingViewModel
+import org.koin.android.ext.android.inject
+import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.util.*
 
 import java.util.concurrent.TimeUnit
 import kotlin.concurrent.schedule
 
-import javax.inject.Inject
-
-class ListingActivity : DaggerAppCompatActivity() {
+class ListingActivity : AppCompatActivity() {
     private lateinit var binding: ActivityListingBinding
-    private lateinit var listingViewModel: ListingViewModel
     private lateinit var layoutManager: LinearLayoutManager
     private val disposable = CompositeDisposable()
     //    private var toast: Toast? = null
     private lateinit var snackbar: Snackbar
 
-    @Inject
-    lateinit var viewModelFactory: ViewModelProvider.Factory
-    @Inject
-    lateinit var adapter: ListingAdapter
-    @Inject
-    lateinit var prefs: SharedPreferences
+    private val listingViewModel by viewModel<ListingViewModel>()
+    private val adapter by inject<ListingAdapter>()
+    private val prefs by inject<SharedPreferences>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -69,7 +64,6 @@ class ListingActivity : DaggerAppCompatActivity() {
 
         binding.recyclerView.adapter = adapter
 
-        listingViewModel = ViewModelProviders.of(this, viewModelFactory).get(ListingViewModel::class.java)
         binding.swipeRefresh.isRefreshing = true
         listingViewModel.listLiveData.observe(this, Observer { lists -> adapter.submitList(lists) })
         listingViewModel.networkState.observe(this, Observer { networkState ->

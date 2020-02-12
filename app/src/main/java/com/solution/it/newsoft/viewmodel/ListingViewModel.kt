@@ -16,9 +16,7 @@ import com.solution.it.newsoft.paging.ListDataSource
 import java.util.concurrent.Executor
 import java.util.concurrent.Executors
 
-import javax.inject.Inject
-
-class ListingViewModel @Inject
+class ListingViewModel
 internal constructor(private val repository: Repository, private val listDataFactory: ListDataFactory) : ViewModel() {
     val networkState: LiveData<NetworkState>
     val listLiveData: LiveData<PagedList<List>>

@@ -4,19 +4,18 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.os.Handler
+import androidx.appcompat.app.AppCompatActivity
 
 import com.solution.it.newsoft.R
 import com.solution.it.newsoft.viewmodel.ListingViewModel
 
-import javax.inject.Inject
-
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
-import dagger.android.support.DaggerAppCompatActivity
+import org.koin.android.ext.android.inject
 
-class MainActivity : DaggerAppCompatActivity() {
+class MainActivity : AppCompatActivity() {
 
-    @Inject lateinit var prefs: SharedPreferences
+    private val prefs by inject<SharedPreferences>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

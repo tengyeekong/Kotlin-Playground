@@ -12,10 +12,7 @@ import com.solution.it.newsoft.databinding.ItemProgressBinding
 import com.solution.it.newsoft.model.List
 import com.solution.it.newsoft.model.NetworkState
 
-import javax.inject.Inject
-
-class ListingAdapter @Inject
-constructor() : PagedListAdapter<List, RecyclerView.ViewHolder>(DIFF_CALLBACK) {
+class ListingAdapter : PagedListAdapter<List, RecyclerView.ViewHolder>(DIFF_CALLBACK) {
     private var networkState = NetworkState.LOADING
     private var listener: OnItemClickListener? = null
 

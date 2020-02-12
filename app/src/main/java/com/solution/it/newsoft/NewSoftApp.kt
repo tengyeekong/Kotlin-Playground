@@ -1,16 +1,27 @@
 package com.solution.it.newsoft
 
-import com.solution.it.newsoft.dagger.DaggerAppComponent
+import android.app.Application
+import com.solution.it.newsoft.koin.*
 
-import javax.inject.Singleton
+import org.koin.android.ext.koin.androidContext
+import org.koin.android.ext.koin.androidLogger
+import org.koin.core.context.startKoin
 
-import dagger.android.AndroidInjector
-import dagger.android.DaggerApplication
+class NewSoftApp : Application() {
 
-@Singleton
-class NewSoftApp : DaggerApplication() {
+    override fun onCreate() {
+        super.onCreate()
+        setupKoin()
+    }
 
-    override fun applicationInjector(): AndroidInjector<out DaggerApplication> {
-        return DaggerAppComponent.builder().application(this).build()
+    private fun setupKoin() {
+        startKoin {
+            androidLogger()
+            androidContext(this@NewSoftApp)
+            modules(listOf(
+                    appModule,
+                    listingModule
+            ))
+        }
     }
 }

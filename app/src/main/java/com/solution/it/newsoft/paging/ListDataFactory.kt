@@ -2,13 +2,11 @@ package com.solution.it.newsoft.paging
 
 import com.solution.it.newsoft.datasource.Repository
 
-import javax.inject.Inject
-
 import androidx.lifecycle.MutableLiveData
 import androidx.paging.DataSource
 import com.solution.it.newsoft.model.List
 
-class ListDataFactory @Inject
+class ListDataFactory
 internal constructor(private val repository: Repository) : DataSource.Factory<Long, List>() {
 
     val mutableLiveData: MutableLiveData<ListDataSource> = MutableLiveData()

@@ -11,17 +11,9 @@ class NewSoftApp : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        setupKoin()
-    }
-
-    private fun setupKoin() {
         startKoin {
             androidLogger()
             androidContext(this@NewSoftApp)
-            modules(listOf(
-                    appModule,
-                    listingModule
-            ))
         }
     }
 }

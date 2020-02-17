@@ -9,7 +9,17 @@ import com.solution.it.newsoft.paging.ListingAdapter
 import com.solution.it.newsoft.viewmodel.ListingViewModel
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
+import org.koin.core.context.loadKoinModules
 import org.koin.dsl.module
+
+fun injectFeature() = loadFeature
+
+private val loadFeature by lazy {
+    loadKoinModules(listOf(
+            appModule,
+            listingModule
+    ))
+}
 
 val appModule = module {
     single { RetrofitClientInstance.apiService }

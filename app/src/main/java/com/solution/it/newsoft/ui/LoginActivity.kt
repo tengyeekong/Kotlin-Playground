@@ -11,6 +11,7 @@ import androidx.lifecycle.Observer
 
 import com.solution.it.newsoft.R
 import com.solution.it.newsoft.databinding.ActivityLoginBinding
+import com.solution.it.newsoft.koin.injectFeature
 import com.solution.it.newsoft.viewmodel.ListingViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -21,6 +22,7 @@ class LoginActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        injectFeature()
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_login)
 

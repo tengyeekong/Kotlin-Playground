@@ -11,6 +11,7 @@ import com.solution.it.newsoft.viewmodel.ListingViewModel
 
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
+import com.solution.it.newsoft.koin.injectFeature
 import org.koin.android.ext.android.inject
 
 class MainActivity : AppCompatActivity() {
@@ -19,6 +20,8 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        injectFeature()
+
         DataBindingUtil.setContentView<ViewDataBinding>(this, R.layout.activity_main)
 
         Handler().postDelayed({

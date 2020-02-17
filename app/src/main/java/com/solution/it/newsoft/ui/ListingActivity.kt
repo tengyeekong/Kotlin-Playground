@@ -29,6 +29,7 @@ import com.google.android.material.snackbar.Snackbar
 import com.solution.it.newsoft.R
 import com.solution.it.newsoft.databinding.ActivityListingBinding
 import com.solution.it.newsoft.databinding.DialogUpdateListBinding
+import com.solution.it.newsoft.koin.injectFeature
 import com.solution.it.newsoft.model.List
 import com.solution.it.newsoft.paging.ListingAdapter
 import com.solution.it.newsoft.viewmodel.ListingViewModel
@@ -52,6 +53,8 @@ class ListingActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        injectFeature()
+
         binding = DataBindingUtil.setContentView(this, R.layout.activity_listing)
 
         supportActionBar?.setDisplayHomeAsUpEnabled(false)

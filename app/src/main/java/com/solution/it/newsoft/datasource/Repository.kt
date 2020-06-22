@@ -2,6 +2,7 @@ package com.solution.it.newsoft.datasource
 
 import android.annotation.SuppressLint
 import android.content.SharedPreferences
+import androidx.hilt.lifecycle.ViewModelInject
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -25,8 +26,9 @@ import io.reactivex.schedulers.Schedulers
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import javax.inject.Inject
 
-class Repository(private val service: ApiService, private val prefs: SharedPreferences) {
+class Repository @Inject constructor(private val service: ApiService, private val prefs: SharedPreferences) {
 
     init {
         id = prefs.getString(ListingViewModel.ID, "") ?: ""

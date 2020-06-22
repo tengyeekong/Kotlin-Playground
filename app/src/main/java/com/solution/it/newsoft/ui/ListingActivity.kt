@@ -10,11 +10,11 @@ import android.view.MenuItem
 import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.github.razir.progressbutton.attachTextChangeAnimator
 import com.github.razir.progressbutton.bindProgressButton
@@ -29,17 +29,17 @@ import com.google.android.material.snackbar.Snackbar
 import com.solution.it.newsoft.R
 import com.solution.it.newsoft.databinding.ActivityListingBinding
 import com.solution.it.newsoft.databinding.DialogUpdateListBinding
-import com.solution.it.newsoft.koin.injectFeature
 import com.solution.it.newsoft.model.List
 import com.solution.it.newsoft.paging.ListingAdapter
 import com.solution.it.newsoft.viewmodel.ListingViewModel
-import org.koin.android.ext.android.inject
-import org.koin.androidx.viewmodel.ext.android.viewModel
+import dagger.hilt.android.AndroidEntryPoint
 import java.util.*
 
 import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 import kotlin.concurrent.schedule
 
+@AndroidEntryPoint
 class ListingActivity : AppCompatActivity() {
     private lateinit var binding: ActivityListingBinding
     private lateinit var layoutManager: LinearLayoutManager
@@ -47,13 +47,12 @@ class ListingActivity : AppCompatActivity() {
     //    private var toast: Toast? = null
     private lateinit var snackbar: Snackbar
 
-    private val listingViewModel by viewModel<ListingViewModel>()
-    private val adapter by inject<ListingAdapter>()
-    private val prefs by inject<SharedPreferences>()
+    private val listingViewModel: ListingViewModel by viewModels()
+    @Inject lateinit var adapter: ListingAdapter
+    @Inject lateinit var prefs: SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        injectFeature()
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_listing)
 

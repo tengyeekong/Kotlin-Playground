@@ -11,16 +11,16 @@ import com.solution.it.newsoft.viewmodel.ListingViewModel
 
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
-import com.solution.it.newsoft.koin.injectFeature
-import org.koin.android.ext.android.inject
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
-    private val prefs by inject<SharedPreferences>()
+    @Inject lateinit var prefs: SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        injectFeature()
 
         DataBindingUtil.setContentView<ViewDataBinding>(this, R.layout.activity_main)
 

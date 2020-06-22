@@ -5,9 +5,9 @@ import com.solution.it.newsoft.datasource.Repository
 import androidx.lifecycle.MutableLiveData
 import androidx.paging.DataSource
 import com.solution.it.newsoft.model.List
+import javax.inject.Inject
 
-class ListDataFactory
-internal constructor(private val repository: Repository) : DataSource.Factory<Long, List>() {
+class ListDataFactory @Inject constructor(private val repository: Repository) : DataSource.Factory<Long, List>() {
 
     val mutableLiveData: MutableLiveData<ListDataSource> = MutableLiveData()
     private lateinit var feedDataSource: ListDataSource

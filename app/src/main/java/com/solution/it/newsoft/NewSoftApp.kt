@@ -2,12 +2,10 @@ package com.solution.it.newsoft
 
 import android.app.Application
 import com.solution.it.newsoft.koin.*
+import dagger.hilt.android.HiltAndroidApp
 
-import org.koin.android.ext.koin.androidContext
-import org.koin.android.ext.koin.androidLogger
-import org.koin.core.context.startKoin
-
-class NewSoftApp : Application() {
+@HiltAndroidApp
+class NewSoftApp : Application() /*{
 
     override fun onCreate() {
         super.onCreate()
@@ -16,4 +14,4 @@ class NewSoftApp : Application() {
             androidContext(this@NewSoftApp)
         }
     }
-}
+}*/

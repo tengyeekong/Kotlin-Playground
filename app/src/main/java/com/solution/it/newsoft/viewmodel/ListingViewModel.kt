@@ -1,6 +1,9 @@
 package com.solution.it.newsoft.viewmodel
 
+import androidx.hilt.Assisted
+import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import androidx.paging.LivePagedListBuilder
@@ -17,7 +20,7 @@ import java.util.concurrent.Executor
 import java.util.concurrent.Executors
 
 class ListingViewModel
-internal constructor(private val repository: Repository, private val listDataFactory: ListDataFactory) : ViewModel() {
+@ViewModelInject constructor(private val repository: Repository, private val listDataFactory: ListDataFactory, @Assisted private val savedStateHandle: SavedStateHandle) : ViewModel() {
     val networkState: LiveData<NetworkState>
     val listLiveData: LiveData<PagedList<List>>
 

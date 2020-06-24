@@ -5,8 +5,11 @@ import com.solution.it.newsoft.datasource.Repository
 import androidx.lifecycle.MutableLiveData
 import androidx.paging.DataSource
 import com.solution.it.newsoft.model.List
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import javax.inject.Inject
 
+@ExperimentalCoroutinesApi
 class ListDataFactory @Inject constructor(private val repository: Repository) : DataSource.Factory<Long, List>() {
 
     val mutableLiveData: MutableLiveData<ListDataSource> = MutableLiveData()
@@ -21,4 +24,6 @@ class ListDataFactory @Inject constructor(private val repository: Repository) : 
     fun reload() = feedDataSource.invalidate()
 
     fun retry() = feedDataSource.retry()
+
+    fun clearCoroutineJobs() = feedDataSource.clearCoroutineJobs()
 }

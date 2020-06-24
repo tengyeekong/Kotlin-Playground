@@ -5,6 +5,7 @@ import com.solution.it.newsoft.model.Login
 import com.solution.it.newsoft.model.UpdateStatus
 
 import retrofit2.Call
+import retrofit2.Response
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
 import retrofit2.http.GET
@@ -15,24 +16,24 @@ interface ApiService {
 
     @FormUrlEncoded
     @POST("login")
-    fun login(
+    suspend fun login(
             @Field("email") username: String,
             @Field("password") password: String
-    ): Call<Login>
+    ): Response<Login>
 
     @GET("listing")
-    fun getListing(
+    suspend fun getListing(
             @Query("id") id: String,
             @Query("token") token: String
-    ): Call<Listing>
+    ): Response<Listing>
 
     @FormUrlEncoded
     @POST("listing/update")
-    fun updateList(
+    suspend fun updateList(
             @Field("id") id: String,
             @Field("token") token: String,
             @Field("listing_id") listing_id: String,
             @Field("listing_name") listing_name: String,
             @Field("distance") distance: String
-    ): Call<UpdateStatus>
+    ): Response<UpdateStatus>
 }

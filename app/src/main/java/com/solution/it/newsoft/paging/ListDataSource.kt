@@ -10,8 +10,13 @@ import androidx.paging.PageKeyedDataSource
 import io.reactivex.Completable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.*
 
+@ExperimentalCoroutinesApi
 class ListDataSource internal constructor(private val repository: Repository) : PageKeyedDataSource<Long, List>() {
+    private val completableJob = Job()
+    private val exceptionHandler = CoroutineExceptionHandler { _, throwable -> throwable.printStackTrace() }
+    private val coroutineScope = CoroutineScope(Dispatchers.IO + completableJob + exceptionHandler)
     private var params: LoadParams<Long>? = null
     private var callback: LoadCallback<Long, List>? = null
 
@@ -24,7 +29,15 @@ class ListDataSource internal constructor(private val repository: Repository) : 
 
         networkState.postValue(NetworkState.LOADING)
 
-        repository.getListing(callback, null, networkState, 2L)
+        coroutineScope.launch {
+            val list = repository.getListing()
+            if (list == null) {
+                networkState.postValue(NetworkState.FAILED)
+            } else {
+                networkState.postValue(NetworkState.LOADED)
+                callback.onResult(list.toList(), null, 2L)
+            }
+        }
     }
 
     override fun loadBefore(params: LoadParams<Long>,
@@ -44,10 +57,23 @@ class ListDataSource internal constructor(private val repository: Repository) : 
 
         val nextKey = params.key + 1
         val itemCount = Integer.valueOf(params.key.toString()) * 10
-        if (params.key > 1) {
-            repository.getDummies(itemCount, callback, networkState, nextKey)
-        } else {
-            repository.getListing(null, callback, networkState, nextKey)
+        coroutineScope.launch {
+            if (params.key > 1) {
+                val list = repository.getDummies(itemCount)
+                delay(1000)
+                if (list.isNotEmpty()) {
+                    callback.onResult(list, nextKey)
+                }
+                networkState.postValue(NetworkState.LOADED)
+            } else {
+                val list = repository.getListing()
+                if (list == null) {
+                    networkState.postValue(NetworkState.FAILED)
+                } else {
+                    networkState.postValue(NetworkState.LOADED)
+                    callback.onResult(list.toList(), nextKey)
+                }
+            }
         }
     }
 
@@ -56,6 +82,10 @@ class ListDataSource internal constructor(private val repository: Repository) : 
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe()
+    }
+
+    fun clearCoroutineJobs() {
+        completableJob.cancel()
     }
 
     companion object {

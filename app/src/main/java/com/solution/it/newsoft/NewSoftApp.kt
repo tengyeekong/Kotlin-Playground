@@ -1,7 +1,6 @@
 package com.solution.it.newsoft
 
 import android.app.Application
-import com.solution.it.newsoft.koin.*
 import dagger.hilt.android.HiltAndroidApp
 
 @HiltAndroidApp

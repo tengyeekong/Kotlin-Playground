@@ -2,10 +2,7 @@ package com.solution.it.newsoft.viewmodel
 
 import androidx.hilt.Assisted
 import androidx.hilt.lifecycle.ViewModelInject
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.Transformations
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.*
 import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
 
@@ -15,10 +12,11 @@ import com.solution.it.newsoft.model.Login
 import com.solution.it.newsoft.model.NetworkState
 import com.solution.it.newsoft.paging.ListDataFactory
 import com.solution.it.newsoft.paging.ListDataSource
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 
-import java.util.concurrent.Executor
 import java.util.concurrent.Executors
 
+@ExperimentalCoroutinesApi
 class ListingViewModel
 @ViewModelInject constructor(private val repository: Repository, private val listDataFactory: ListDataFactory, @Assisted private val savedStateHandle: SavedStateHandle) : ViewModel() {
     val networkState: LiveData<NetworkState>
@@ -52,12 +50,13 @@ class ListingViewModel
     //        return repository.getListing(id, token);
     //    }
 
-    fun login(username: String, password: String): LiveData<Login> {
-        return repository.login(username, password)
-    }
+    fun login(username: String, password: String): LiveData<Login> = repository.login(username, password).asLiveData(viewModelScope.coroutineContext)
 
-    fun updateList(id: String, listName: String, distance: String): LiveData<Boolean> {
-        return repository.updateList(id, listName, distance)
+    fun updateList(id: String, listName: String, distance: String): LiveData<Boolean> = repository.updateList(id, listName, distance).asLiveData(viewModelScope.coroutineContext)
+
+    override fun onCleared() {
+        super.onCleared()
+        listDataFactory.clearCoroutineJobs()
     }
 
     companion object {

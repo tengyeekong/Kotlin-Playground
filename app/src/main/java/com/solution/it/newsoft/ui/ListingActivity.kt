@@ -33,12 +33,14 @@ import com.solution.it.newsoft.model.List
 import com.solution.it.newsoft.paging.ListingAdapter
 import com.solution.it.newsoft.viewmodel.ListingViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import java.util.*
 
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlin.concurrent.schedule
 
+@ExperimentalCoroutinesApi
 @AndroidEntryPoint
 class ListingActivity : AppCompatActivity() {
     private lateinit var binding: ActivityListingBinding
@@ -82,7 +84,7 @@ class ListingActivity : AppCompatActivity() {
                 snackbar = Snackbar.make(binding.coordinatorLayout,
                         StringBuilder("List name: ").append(list.list_name)
                                 .append("\n")
-                                .append("Distance: ").append(list.distance), Snackbar.LENGTH_SHORT);
+                                .append("Distance: ").append(list.distance), Snackbar.LENGTH_SHORT)
                 snackbar.show()
 
 //                if (toast != null) toast!!.cancel()

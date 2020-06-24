@@ -80,18 +80,23 @@ class ListingActivity : AppCompatActivity() {
             }
         }
 
-        lifecycleScope.launch {
-            adapter.loadStateFlow.collectLatest { loadStates ->
-                val networkState = when (loadStates.refresh) {
-                    is LoadState.Loading -> { NetworkState.LOADING }
-                    is LoadState.NotLoading -> { NetworkState.LOADED }
-                    is LoadState.Error -> { NetworkState.FAILED }
-                }
-                adapter.setNetworkState(networkState)
-                if (binding.swipeRefresh.isRefreshing)
-                    binding.swipeRefresh.isRefreshing = false
-            }
-        }
+//        lifecycleScope.launch {
+//            adapter.loadStateFlow.collectLatest { loadStates ->
+//                val networkState = when (loadStates.refresh) {
+//                    is LoadState.Loading -> { NetworkState.LOADING }
+//                    is LoadState.NotLoading -> { NetworkState.LOADED }
+//                    is LoadState.Error -> { NetworkState.FAILED }
+//                }
+//                adapter.setNetworkState(networkState)
+//                if (binding.swipeRefresh.isRefreshing)
+//                    binding.swipeRefresh.isRefreshing = false
+//            }
+//        }
+        viewModel.getNetworkState().observe(this, Observer { networkState ->
+            adapter.setNetworkState(networkState)
+            if (binding.swipeRefresh.isRefreshing)
+                binding.swipeRefresh.isRefreshing = false
+        })
 
         binding.swipeRefresh.setColorSchemeColors(getColor(R.color.colorPrimary))
         binding.swipeRefresh.setOnRefreshListener { refreshList() }

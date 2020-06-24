@@ -15,14 +15,17 @@ import java.util.concurrent.Executors
 @ExperimentalCoroutinesApi
 class ListingViewModel
 @ViewModelInject constructor(private val repository: Repository, @Assisted private val savedStateHandle: SavedStateHandle) : ViewModel() {
+
+    private val dataSource = ListDataSource(repository)
     val flow = Pager(
             // Configure how data is loaded by passing additional properties to
             // PagingConfig, such as prefetchDistance.
             PagingConfig(pageSize = 10, initialLoadSize = 20, enablePlaceholders = false)
     ) {
-        ListDataSource(repository)
-    }.flow
-            .cachedIn(viewModelScope)
+        dataSource
+    }.flow.cachedIn(viewModelScope)
+
+    fun getNetworkState() = dataSource.getNetworkState()
 
     fun login(username: String, password: String): LiveData<Login> = repository.login(username, password).asLiveData(viewModelScope.coroutineContext)
 

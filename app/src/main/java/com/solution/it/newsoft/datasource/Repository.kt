@@ -49,7 +49,7 @@ class Repository @Inject constructor(private val service: ApiService, private va
             val list = List(value, value, value)
             lists.add(list)
         }
-        delay(2000)
+        delay(1000)
         return lists
     }
 

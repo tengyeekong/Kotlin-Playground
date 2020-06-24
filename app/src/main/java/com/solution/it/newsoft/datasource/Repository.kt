@@ -9,6 +9,7 @@ import com.solution.it.newsoft.viewmodel.ListingViewModel
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
@@ -40,7 +41,7 @@ class Repository @Inject constructor(private val service: ApiService, private va
         } else null
     }
 
-    fun getDummies(itemCount: Int): ArrayList<List> {
+    suspend fun getDummies(itemCount: Int): ArrayList<List> {
         val lists = ArrayList<List>()
         var count = 10000 + itemCount
         for (i in 0..9 /*&& count < 10105*/) {
@@ -48,6 +49,7 @@ class Repository @Inject constructor(private val service: ApiService, private va
             val list = List(value, value, value)
             lists.add(list)
         }
+        delay(2000)
         return lists
     }
 

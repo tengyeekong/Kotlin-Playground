@@ -15,6 +15,8 @@ import androidx.appcompat.app.AppCompatActivity
 
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
+import androidx.paging.LoadState
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.github.razir.progressbutton.attachTextChangeAnimator
 import com.github.razir.progressbutton.bindProgressButton
@@ -30,10 +32,13 @@ import com.solution.it.newsoft.R
 import com.solution.it.newsoft.databinding.ActivityListingBinding
 import com.solution.it.newsoft.databinding.DialogUpdateListBinding
 import com.solution.it.newsoft.model.List
+import com.solution.it.newsoft.model.NetworkState
 import com.solution.it.newsoft.paging.ListingAdapter
 import com.solution.it.newsoft.viewmodel.ListingViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import java.util.*
 
 import java.util.concurrent.TimeUnit
@@ -46,10 +51,9 @@ class ListingActivity : AppCompatActivity() {
     private lateinit var binding: ActivityListingBinding
     private lateinit var layoutManager: LinearLayoutManager
     private val disposable = CompositeDisposable()
-    //    private var toast: Toast? = null
     private lateinit var snackbar: Snackbar
 
-    private val listingViewModel: ListingViewModel by viewModels()
+    private val viewModel: ListingViewModel by viewModels()
     @Inject lateinit var adapter: ListingAdapter
     @Inject lateinit var prefs: SharedPreferences
 
@@ -69,12 +73,25 @@ class ListingActivity : AppCompatActivity() {
         binding.recyclerView.adapter = adapter
 
         binding.swipeRefresh.isRefreshing = true
-        listingViewModel.listLiveData.observe(this, Observer { lists -> adapter.submitList(lists) })
-        listingViewModel.networkState.observe(this, Observer { networkState ->
-            adapter.setNetworkState(networkState)
-            if (binding.swipeRefresh.isRefreshing)
-                binding.swipeRefresh.isRefreshing = false
-        })
+
+        lifecycleScope.launch {
+            viewModel.flow.collectLatest { pagingData ->
+                adapter.submitData(pagingData)
+            }
+        }
+
+        lifecycleScope.launch {
+            adapter.loadStateFlow.collectLatest { loadStates ->
+                val networkState = when (loadStates.refresh) {
+                    is LoadState.Loading -> { NetworkState.LOADING }
+                    is LoadState.NotLoading -> { NetworkState.LOADED }
+                    is LoadState.Error -> { NetworkState.FAILED }
+                }
+                adapter.setNetworkState(networkState)
+                if (binding.swipeRefresh.isRefreshing)
+                    binding.swipeRefresh.isRefreshing = false
+            }
+        }
 
         binding.swipeRefresh.setColorSchemeColors(getColor(R.color.colorPrimary))
         binding.swipeRefresh.setOnRefreshListener { refreshList() }
@@ -86,13 +103,6 @@ class ListingActivity : AppCompatActivity() {
                                 .append("\n")
                                 .append("Distance: ").append(list.distance), Snackbar.LENGTH_SHORT)
                 snackbar.show()
-
-//                if (toast != null) toast!!.cancel()
-//                toast = Toast.makeText(this@ListingActivity,
-//                        StringBuilder("List name: ").append(list.list_name)
-//                                .append("\n")
-//                                .append("Distance: ").append(list.distance), Toast.LENGTH_SHORT)
-//                toast?.show()
             }
 
             override fun onItemLongClick(list: List, position: Int) {
@@ -100,14 +110,13 @@ class ListingActivity : AppCompatActivity() {
             }
 
             override fun onRetryClick() {
-                listingViewModel.retry()
+                adapter.retry()
             }
         })
     }
 
     private fun refreshList() {
-        binding.swipeRefresh.isRefreshing = true
-        listingViewModel.reload()
+        adapter.refresh()
     }
 
     private fun showUpdateDialog(list: List, position: Int) {
@@ -133,7 +142,7 @@ class ListingActivity : AppCompatActivity() {
             progressColorRes = R.color.colorPrimary
         }
 
-        val isUpdated = listingViewModel.updateList(list.id, dialogBinding.etListName.text.toString(),
+        val isUpdated = viewModel.updateList(list.id, dialogBinding.etListName.text.toString(),
                 dialogBinding.etDistance.text.toString())
         isUpdated.observe(this, Observer { aBoolean ->
             if (aBoolean) {

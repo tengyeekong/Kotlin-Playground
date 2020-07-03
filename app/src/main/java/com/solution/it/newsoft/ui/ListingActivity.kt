@@ -33,6 +33,7 @@ import com.solution.it.newsoft.databinding.ActivityListingBinding
 import com.solution.it.newsoft.databinding.DialogUpdateListBinding
 import com.solution.it.newsoft.model.List
 import com.solution.it.newsoft.model.NetworkState
+import com.solution.it.newsoft.paging.FooterAdapter
 import com.solution.it.newsoft.paging.ListingAdapter
 import com.solution.it.newsoft.viewmodel.ListingViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -70,33 +71,17 @@ class ListingActivity : AppCompatActivity() {
         binding.recyclerView.layoutManager = layoutManager
         binding.recyclerView.setHasFixedSize(true)
 
-        binding.recyclerView.adapter = adapter
+        val footerAdapter = FooterAdapter(adapter)
+        binding.recyclerView.adapter = adapter.withLoadStateFooter(footerAdapter)
 
         binding.swipeRefresh.isRefreshing = true
 
         lifecycleScope.launch {
             viewModel.flow.collectLatest { pagingData ->
+                binding.swipeRefresh.isRefreshing = false
                 adapter.submitData(pagingData)
             }
         }
-
-//        lifecycleScope.launch {
-//            adapter.loadStateFlow.collectLatest { loadStates ->
-//                val networkState = when (loadStates.refresh) {
-//                    is LoadState.Loading -> { NetworkState.LOADING }
-//                    is LoadState.NotLoading -> { NetworkState.LOADED }
-//                    is LoadState.Error -> { NetworkState.FAILED }
-//                }
-//                adapter.setNetworkState(networkState)
-//                if (binding.swipeRefresh.isRefreshing)
-//                    binding.swipeRefresh.isRefreshing = false
-//            }
-//        }
-        viewModel.getNetworkState().observe(this, Observer { networkState ->
-            adapter.setNetworkState(networkState)
-            if (binding.swipeRefresh.isRefreshing)
-                binding.swipeRefresh.isRefreshing = false
-        })
 
         binding.swipeRefresh.setColorSchemeColors(getColor(R.color.colorPrimary))
         binding.swipeRefresh.setOnRefreshListener { refreshList() }
@@ -112,10 +97,6 @@ class ListingActivity : AppCompatActivity() {
 
             override fun onItemLongClick(list: List, position: Int) {
                 showUpdateDialog(list, position)
-            }
-
-            override fun onRetryClick() {
-                adapter.retry()
             }
         })
     }

@@ -15,6 +15,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.github.razir.progressbutton.attachTextChangeAnimator
 import com.github.razir.progressbutton.bindProgressButton
@@ -31,8 +32,11 @@ import com.solution.it.newsoft.R
 import com.solution.it.newsoft.databinding.ActivityListingBinding
 import com.solution.it.newsoft.databinding.DialogUpdateListBinding
 import com.solution.it.newsoft.model.List
+import com.solution.it.newsoft.paging.FooterAdapter
 import com.solution.it.newsoft.paging.ListingAdapter
 import com.solution.it.newsoft.viewmodel.ListingViewModel
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import java.util.*
 
 import java.util.concurrent.TimeUnit
@@ -42,10 +46,9 @@ import javax.inject.Inject
 
 class ListingActivity : DaggerAppCompatActivity() {
     private lateinit var binding: ActivityListingBinding
-    private lateinit var listingViewModel: ListingViewModel
+    private lateinit var viewModel: ListingViewModel
     private lateinit var layoutManager: LinearLayoutManager
     private val disposable = CompositeDisposable()
-    //    private var toast: Toast? = null
     private lateinit var snackbar: Snackbar
 
     @Inject
@@ -67,16 +70,18 @@ class ListingActivity : DaggerAppCompatActivity() {
         binding.recyclerView.layoutManager = layoutManager
         binding.recyclerView.setHasFixedSize(true)
 
-        binding.recyclerView.adapter = adapter
+        val footerAdapter = FooterAdapter(adapter)
+        binding.recyclerView.adapter = adapter.withLoadStateFooter(footerAdapter)
 
-        listingViewModel = ViewModelProviders.of(this, viewModelFactory).get(ListingViewModel::class.java)
+        viewModel = ViewModelProvider(this, viewModelFactory).get(ListingViewModel::class.java)
         binding.swipeRefresh.isRefreshing = true
-        listingViewModel.listLiveData.observe(this, Observer { lists -> adapter.submitList(lists) })
-        listingViewModel.networkState.observe(this, Observer { networkState ->
-            adapter.setNetworkState(networkState)
-            if (binding.swipeRefresh.isRefreshing)
+
+        lifecycleScope.launch {
+            viewModel.flow.collectLatest { pagingData ->
                 binding.swipeRefresh.isRefreshing = false
-        })
+                adapter.submitData(pagingData)
+            }
+        }
 
         binding.swipeRefresh.setColorSchemeColors(getColor(R.color.colorPrimary))
         binding.swipeRefresh.setOnRefreshListener { refreshList() }
@@ -86,30 +91,18 @@ class ListingActivity : DaggerAppCompatActivity() {
                 snackbar = Snackbar.make(binding.coordinatorLayout,
                         StringBuilder("List name: ").append(list.list_name)
                                 .append("\n")
-                                .append("Distance: ").append(list.distance), Snackbar.LENGTH_SHORT);
+                                .append("Distance: ").append(list.distance), Snackbar.LENGTH_SHORT)
                 snackbar.show()
-
-//                if (toast != null) toast!!.cancel()
-//                toast = Toast.makeText(this@ListingActivity,
-//                        StringBuilder("List name: ").append(list.list_name)
-//                                .append("\n")
-//                                .append("Distance: ").append(list.distance), Toast.LENGTH_SHORT)
-//                toast?.show()
             }
 
             override fun onItemLongClick(list: List, position: Int) {
                 showUpdateDialog(list, position)
             }
-
-            override fun onRetryClick() {
-                listingViewModel.retry()
-            }
         })
     }
 
     private fun refreshList() {
-        binding.swipeRefresh.isRefreshing = true
-        listingViewModel.reload()
+        adapter.refresh()
     }
 
     private fun showUpdateDialog(list: List, position: Int) {
@@ -135,9 +128,9 @@ class ListingActivity : DaggerAppCompatActivity() {
             progressColorRes = R.color.colorPrimary
         }
 
-        val isUpdated = listingViewModel.updateList(list.id, dialogBinding.etListName.text.toString(),
+        val isUpdated = viewModel.updateList(list.id, dialogBinding.etListName.text.toString(),
                 dialogBinding.etDistance.text.toString())
-        isUpdated.observe(this, Observer { aBoolean ->
+        isUpdated.observe(this, { aBoolean ->
             if (aBoolean) {
                 adapter.updateList(position, dialogBinding.etListName.text.toString(),
                         dialogBinding.etDistance.text.toString())

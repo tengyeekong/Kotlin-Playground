@@ -27,8 +27,11 @@ class LoginActivity : DaggerAppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        // username: admin@advisoryapps.com
+        // password: advisoryapps123
+
         binding = DataBindingUtil.setContentView(this, R.layout.activity_login)
-        listingViewModel = ViewModelProviders.of(this, viewModelFactory).get(ListingViewModel::class.java)
+        listingViewModel = ViewModelProvider(this, viewModelFactory).get(ListingViewModel::class.java)
 
         supportActionBar?.setDisplayHomeAsUpEnabled(false)
         supportActionBar?.setDisplayShowHomeEnabled(false)
@@ -39,7 +42,7 @@ class LoginActivity : DaggerAppCompatActivity() {
             } else {
                 val progress = ProgressDialog.show(this, "", "Loading...", true)
                 progress.show()
-                listingViewModel.login(binding.etUsername.text.toString(), binding.etPassword.text.toString()).observe(this, Observer { login ->
+                listingViewModel.login(binding.etUsername.text.toString(), binding.etPassword.text.toString()).observe(this, { login ->
                     if (login != null) {
                         if (!(login.status == null || login.status.code != "200")) {
                             val intent = Intent(this, ListingActivity::class.java)

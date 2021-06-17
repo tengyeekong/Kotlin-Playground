@@ -1,63 +1,32 @@
 package com.solution.it.newsoft.viewmodel
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.Transformations
-import androidx.lifecycle.ViewModel
-import androidx.paging.LivePagedListBuilder
-import androidx.paging.PagedList
+import androidx.lifecycle.*
+import androidx.paging.*
 
 import com.solution.it.newsoft.datasource.Repository
 import com.solution.it.newsoft.model.List
 import com.solution.it.newsoft.model.Login
 import com.solution.it.newsoft.model.NetworkState
-import com.solution.it.newsoft.paging.ListDataFactory
 import com.solution.it.newsoft.paging.ListDataSource
 
-import java.util.concurrent.Executor
 import java.util.concurrent.Executors
 
 import javax.inject.Inject
 
 class ListingViewModel @Inject
-internal constructor(private val repository: Repository, private val listDataFactory: ListDataFactory) : ViewModel() {
-    val networkState: LiveData<NetworkState>
-    val listLiveData: LiveData<PagedList<List>>
+internal constructor(private val repository: Repository) : ViewModel() {
 
-    init {
-        val executor = Executors.newFixedThreadPool(5)
+    val flow = Pager(
+            // Configure how data is loaded by passing additional properties to
+            // PagingConfig, such as prefetchDistance.
+            PagingConfig(pageSize = 10, initialLoadSize = 20, enablePlaceholders = false)
+    ) {
+        ListDataSource(repository)
+    }.flow.cachedIn(viewModelScope)
 
-        networkState = Transformations.switchMap(listDataFactory.mutableLiveData, ListDataSource::getNetworkState)
+    fun login(username: String, password: String): LiveData<Login?> = repository.login(username, password).asLiveData(viewModelScope.coroutineContext)
 
-        val pagedListConfig = PagedList.Config.Builder()
-                .setPageSize(10)
-                .setInitialLoadSizeHint(20)
-                .setEnablePlaceholders(false)
-                .build()
-
-        listLiveData = LivePagedListBuilder(listDataFactory, pagedListConfig)
-                .setFetchExecutor(executor)
-                .build()
-    }
-
-    fun reload() {
-        listDataFactory.reload()
-    }
-
-    fun retry() {
-        listDataFactory.retry()
-    }
-
-    //    public LiveData<ArrayList<List>> getListing(String id, String token) {
-    //        return repository.getListing(id, token);
-    //    }
-
-    fun login(username: String, password: String): LiveData<Login> {
-        return repository.login(username, password)
-    }
-
-    fun updateList(id: String, listName: String, distance: String): LiveData<Boolean> {
-        return repository.updateList(id, listName, distance)
-    }
+    fun updateList(id: String, listName: String, distance: String): LiveData<Boolean> = repository.updateList(id, listName, distance).asLiveData(viewModelScope.coroutineContext)
 
     companion object {
         const val USERNAME = "username"

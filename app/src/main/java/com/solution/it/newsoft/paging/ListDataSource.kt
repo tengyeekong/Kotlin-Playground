@@ -1,64 +1,56 @@
 package com.solution.it.newsoft.paging
 
-import android.util.Log
-
 import com.solution.it.newsoft.datasource.Repository
 import com.solution.it.newsoft.model.List
+import androidx.paging.PagingSource
+import androidx.paging.PagingState
 import com.solution.it.newsoft.model.NetworkState
-import androidx.lifecycle.MutableLiveData
-import androidx.paging.PageKeyedDataSource
-import io.reactivex.Completable
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.*
 
-class ListDataSource internal constructor(private val repository: Repository) : PageKeyedDataSource<Long, List>() {
-    private var params: LoadParams<Long>? = null
-    private var callback: LoadCallback<Long, List>? = null
+class ListDataSource internal constructor(private val repository: Repository) : PagingSource<Int, List>() {
 
-    private val networkState: MutableLiveData<NetworkState> = MutableLiveData()
+    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, List> {
 
-    fun getNetworkState() = networkState
-
-    override fun loadInitial(params: LoadInitialParams<Long>,
-                             callback: LoadInitialCallback<Long, List>) {
-
-        networkState.postValue(NetworkState.LOADING)
-
-        repository.getListing(callback, null, networkState, 2L)
-    }
-
-    override fun loadBefore(params: LoadParams<Long>,
-                            callback: LoadCallback<Long, List>) {
-
-    }
-
-    override fun loadAfter(params: LoadParams<Long>,
-                           callback: LoadCallback<Long, List>) {
-
-        this.params = params
-        this.callback = callback
-
-        Log.i(TAG, "Loading Page " + params.key + ", Count " + params.requestedLoadSize)
-
-        networkState.postValue(NetworkState.LOADING)
-
-        val nextKey = params.key + 1
-        val itemCount = Integer.valueOf(params.key.toString()) * 10
-        if (params.key > 1) {
-            repository.getDummies(itemCount, callback, networkState, nextKey)
+        val nextPageNumber = params.key ?: 1
+        val itemCount = nextPageNumber * 10
+        if (nextPageNumber == 1) {
+            val list = repository.getListing()
+            return if (!list.isNullOrEmpty()) {
+                LoadResult.Page(
+                        data = list,
+                        prevKey = null,
+                        nextKey = nextPageNumber + 1
+                )
+            } else {
+                LoadResult.Page(
+                        data = ArrayList(),
+                        prevKey = null,
+                        nextKey = null
+                )
+            }
         } else {
-            repository.getListing(null, callback, networkState, nextKey)
+            val list = repository.getDummies(itemCount)
+            return if (list.isNotEmpty()) {
+                LoadResult.Page(
+                        data = list,
+                        prevKey = null,
+                        nextKey = nextPageNumber + 1
+                )
+            } else {
+                LoadResult.Page(
+                        data = ArrayList(),
+                        prevKey = null,
+                        nextKey = null
+                )
+            }
         }
-    }
-
-    fun retry() {
-        Completable.fromAction { loadAfter(params!!, callback!!) }
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe()
     }
 
     companion object {
         private val TAG = ListDataSource::class.java.simpleName
+    }
+
+    override fun getRefreshKey(state: PagingState<Int, List>): Int? {
+        return null
     }
 }

@@ -35,25 +35,21 @@ internal abstract class AppModules {
     @Binds
     internal abstract fun bindViewModelFactory(factory: ListingViewModelFactory): ViewModelProvider.Factory
 
-    @Module
     companion object {
 
         @Singleton
-        @JvmStatic
         @Provides
         fun provideSharedPreferences(context: Context): SharedPreferences {
             return context.getSharedPreferences(BuildConfig.APPLICATION_ID, Context.MODE_PRIVATE)
         }
 
         @Singleton
-        @JvmStatic
         @Provides
         fun provideApiService(): ApiService {
             return RetrofitClientInstance.apiService
         }
 
         @Singleton
-        @JvmStatic
         @Provides
         fun provideRepository(service: ApiService, prefs: SharedPreferences): Repository {
             return Repository(service, prefs)

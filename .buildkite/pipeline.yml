@@ -1,3 +1,13 @@
 steps:
+  - label: ":docker: Build"
+    plugins:
+      - ecr#v2.1.1:
+          login: true
+      - docker-compose#v3.7.0:
+          build: app
+
+  - wait: ~
+    continue_on_failure: false
+
   - label: ":junit: Tests"
     command: ./.buildkite/tests.sh

@@ -1,3 +1,4 @@
+agents:
+  queue: "default"
+
 steps:
-  - command: "buildkite-agent pipeline upload"
-    label: ":pipeline:"

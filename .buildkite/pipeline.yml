@@ -4,3 +4,6 @@ agents:
 steps:
   - label: ":pipeline: Example"
     command: "buildkite-agent pipeline upload"
+    artifact_paths: "artifacts/*"
+    agents:
+      queue: "${BUILDKITE_AGENT_META_DATA_QUEUE:-default}"

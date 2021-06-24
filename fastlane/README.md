@@ -21,11 +21,6 @@ or alternatively using `brew install fastlane`
 fastlane android test
 ```
 Distribute Android app
-### android distribute
-```
-fastlane android distribute
-```
-
 
 ----
 

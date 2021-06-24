@@ -2,7 +2,7 @@
 #
 # Ensure this file is checked in to source control!
 
-gem 'fastlane-plugin-firebase_app_distribution'
-gem 'fastlane-plugin-teams'
-gem 'fastlane-plugin-versioning_android'
+#gem 'fastlane-plugin-firebase_app_distribution'
+#gem 'fastlane-plugin-teams'
+#gem 'fastlane-plugin-versioning_android'
 gem 'fastlane-plugin-pretty_junit'

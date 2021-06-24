@@ -1,5 +1,3 @@
 steps:
-  - command: yarn install && yarn run test
-
   - label: ":junit: Tests"
     command: ./.buildkite/tests.sh

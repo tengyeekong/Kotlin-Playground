@@ -27,7 +27,7 @@ platform :android do
     output_pattern = 'app/build/test-results/testProdReleaseUnitTest/TEST-*.xml'
     
     # We ignore exit code otherwise we wouldn't get to the actions below on test failure
-    gradle(gradle_path: "./android/gradlew", task: "testProdReleaseUnitTest")
+    gradle(task: "testProdReleaseUnitTest")
 
     pretty_junit(file_pattern: output_pattern)
   end

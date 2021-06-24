@@ -1,3 +1,5 @@
 steps:
   - label: ":junit: Tests"
     command: ./.buildkite/tests.sh
+    agents:
+      queue: "yao"

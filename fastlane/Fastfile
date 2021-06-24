@@ -37,20 +37,20 @@ default_platform(:android)
 platform :android do
   desc "Distribute Android app"
 
-  android_get_version_name(
-    gradle_file: "buildSrc/src/main/java/Versions.kt" # optional
-  )
+  # android_get_version_name(
+  #   gradle_file: "buildSrc/src/main/java/Versions.kt" # optional
+  # )
 
-  ENV["ANDROID_VERSION_NAME"] = lane_context[SharedValues::ANDROID_VERSION_NAME]
-  android_get_version_code(
-      gradle_file: "buildSrc/src/main/java/Versions.kt" # optional
-  )
-  ENV["ANDROID_VERSION_CODE"] = lane_context[SharedValues::ANDROID_VERSION_CODE]
+  # ENV["ANDROID_VERSION_NAME"] = lane_context[SharedValues::ANDROID_VERSION_NAME]
+  # android_get_version_code(
+  #     gradle_file: "buildSrc/src/main/java/Versions.kt" # optional
+  # )
+  # ENV["ANDROID_VERSION_CODE"] = lane_context[SharedValues::ANDROID_VERSION_CODE]
 
-  if ENV["BUILDKITE_BUILD_NUMBER"]    
-    ENV["ANDROID_VERSION_CODE"] = ENV["BUILDKITE_BUILD_NUMBER"]
-    puts "Found BUILDKITE_BUILD_NUMBER in env, set ANDROID_VERSION_CODE from BUILDKITE_BUILD_NUMBER: #{ENV["ANDROID_VERSION_CODE"]}"
-  end  
+  # if ENV["BUILDKITE_BUILD_NUMBER"]
+  #   ENV["ANDROID_VERSION_CODE"] = ENV["BUILDKITE_BUILD_NUMBER"]
+  #   puts "Found BUILDKITE_BUILD_NUMBER in env, set ANDROID_VERSION_CODE from BUILDKITE_BUILD_NUMBER: #{ENV["ANDROID_VERSION_CODE"]}"
+  # end
 
   ## TODO: configure the ANDROID_VERSION_CODE for CI, 
   ## because we will replace the versionCode for when building with CI

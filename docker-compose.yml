@@ -1,0 +1,9 @@
+version: "3.8"
+
+services:
+  app:
+    image: 123146320575.dkr.ecr.ap-southeast-1.amazonaws.com/android-kitchen:api29
+    volumes:
+      - $PWD:/workspaces
+    working_dir: /workspaces
+    # build: . #This only need if you need to build docker on the fly with Dockerfile

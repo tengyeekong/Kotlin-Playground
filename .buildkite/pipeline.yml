@@ -1,5 +1,6 @@
 steps:
   - label: ":docker: Build"
+    command: yarn install && yarn run test
     plugins:
       - ecr#v2.1.1:
           login: true

@@ -6,5 +6,8 @@ steps:
       - docker-compose#v3.7.0:
           build: app
 
+  - wait: ~
+    continue_on_failure: false
+
   - label: ":junit: Tests"
     command: ./.buildkite/tests.sh

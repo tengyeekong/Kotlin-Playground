@@ -12,7 +12,7 @@ yarn
 
 ## We use fastlane to run test, because fastlane give us better output
 echo "+++ Tests"
-yarn bundle exec fastlane test
+yarn test
 
 ## Zip HTML reports
 #npx run-func zip.js zipFile "$PROJECT_ROOT" "app/build/reports/tests/testProdReleaseUnitTest"

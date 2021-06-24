@@ -1,0 +1,18 @@
+{
+  "name": "newsoft-android",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Newsoft",
+  "scripts": {
+    "prepare": "bundle install",
+    "fastlane": "bundle exec fastlane",
+    "firebase": "bundle exec fastlane distribute",
+    "firebase:internal": "bundle exec fastlane distribute flavor:Uat",
+    "playstore": "bundle exec fastlane distribute destination:play-store",
+    "playstore:internal": "bundle exec fastlane distribute destination:play-store flavor:Uat",
+    "clean": "bundle exec fastlane run gradle task:clean print_command_output:false",
+    "docker": "docker-compose run app",
+    "test": "bundle exec fastlane test",
+    "gems:update": "bundle update fastlane"
+  }
+}

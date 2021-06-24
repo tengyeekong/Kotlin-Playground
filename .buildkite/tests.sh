@@ -8,6 +8,7 @@ cd "$PROJECT_ROOT" || exit
 set -exo pipefail
 
 echo "--- Install dependencies"
+yarn install
 yarn
 
 ## We use fastlane to run test, because fastlane give us better output

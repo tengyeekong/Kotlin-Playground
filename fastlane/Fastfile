@@ -18,13 +18,9 @@
 default_platform(:android)
 
 platform :android do
-  desc "Distribute Android app"
-
-  ## TODO: configure the ANDROID_VERSION_CODE for CI, 
-  ## because we will replace the versionCode for when building with CI
-
+  desc "Distribute Android app
   lane :test do
-    output_pattern = 'app/build/test-results/testProdReleaseUnitTest/TEST-*.xml'
+    output_pattern = 'app/build/test-results/testDebugUnitTest/TEST-*.xml'
     
     # We ignore exit code otherwise we wouldn't get to the actions below on test failure
     gradle(task: "testDebugUnitTest")

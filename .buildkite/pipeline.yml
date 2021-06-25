@@ -3,3 +3,5 @@ steps:
     command: ./.buildkite/tests.sh
     agents:
       queue: "yao"
+    env:
+      ANDROID_SDK_ROOT: /Users/kongtengyee/Library/Android/sdk

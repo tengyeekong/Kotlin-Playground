@@ -1,8 +1,8 @@
 {
-  "name": "newsoft-android",
+  "name": "kotlin-playground",
   "private": true,
   "version": "1.0.0",
-  "description": "Newsoft",
+  "description": "Kotlin Playground",
   "scripts": {
     "prepare": "bundle install",
     "fastlane": "bundle exec fastlane",

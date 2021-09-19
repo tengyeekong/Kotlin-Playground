@@ -11,8 +11,10 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name="com.tengyeekong.kotlinplayground.ui.MainActivity"
-            android:theme="@style/AppTheme.SplashScreen">
+        <activity
+            android:name="com.tengyeekong.kotlinplayground.ui.MainActivity"
+            android:theme="@style/AppTheme.SplashScreen"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -26,6 +28,7 @@
             android:name="com.tengyeekong.kotlinplayground.ui.ListingActivity"
             android:parentActivityName="com.tengyeekong.kotlinplayground.ui.MainActivity" />
     </application>
+
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 </manifest>

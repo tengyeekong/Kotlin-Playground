@@ -13,8 +13,8 @@
         android:usesCleartextTraffic="true">
         <activity
             android:name="com.tengyeekong.kotlinplayground.ui.MainActivity"
-            android:theme="@style/AppTheme.SplashScreen"
-            android:exported="true">
+            android:exported="true"
+            android:theme="@style/AppTheme.SplashScreen">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -23,7 +23,8 @@
         </activity>
         <activity
             android:name="com.tengyeekong.kotlinplayground.ui.LoginActivity"
-            android:parentActivityName="com.tengyeekong.kotlinplayground.ui.MainActivity" />
+            android:parentActivityName="com.tengyeekong.kotlinplayground.ui.MainActivity"
+            android:windowSoftInputMode="adjustResize" />
         <activity
             android:name="com.tengyeekong.kotlinplayground.ui.ListingActivity"
             android:parentActivityName="com.tengyeekong.kotlinplayground.ui.MainActivity" />

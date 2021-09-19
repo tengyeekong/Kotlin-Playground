@@ -67,8 +67,6 @@ class ListingActivity : DaggerAppCompatActivity() {
     lateinit var prefs: SharedPreferences
 
     private lateinit var focusManager: FocusManager
-    private var keyboardController: SoftwareKeyboardController? = null
-    private var textInputService: TextInputService? = null
     private lateinit var scaffoldState: ScaffoldState
     private lateinit var refreshState: SwipeRefreshState
     private lateinit var listState: LazyListState
@@ -94,8 +92,6 @@ class ListingActivity : DaggerAppCompatActivity() {
 
         setContent {
             focusManager = LocalFocusManager.current
-            keyboardController = LocalSoftwareKeyboardController.current
-            textInputService = LocalTextInputService.current
             scaffoldState = rememberScaffoldState()
             refreshState = rememberSwipeRefreshState(false)
             listState = rememberLazyListState()
@@ -178,14 +174,9 @@ class ListingActivity : DaggerAppCompatActivity() {
                 }
 
                 if (openDialog.value) {
-//                    keyboardController?.show()
-//                    textInputService?.showSoftwareKeyboard()
-
                     UpdateDialog(
                         onButtonClicked = {
                             focusManager.clearFocus()
-                            keyboardController?.hide()
-                            textInputService?.hideSoftwareKeyboard()
 
                             if (!isUpdatingItem.value) {
                                 updateBtnText.value = "Updating"
@@ -318,14 +309,22 @@ class ListingActivity : DaggerAppCompatActivity() {
                             .padding(top = 8.dp),
                         onClick = onButtonClicked
                     ) {
-                        Row {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
                             AnimatedVisibility(visible = isUpdatingItem.value) {
-                                CircularProgressIndicator(
-                                    color = Color(0xffdefcfa),
-                                    modifier = Modifier
-                                        .size(24.dp)
-                                        .padding(end = 8.dp)
-                                )
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    CircularProgressIndicator(
+                                        color = Color(0xffdefcfa),
+                                        strokeWidth = 3.dp,
+                                        modifier = Modifier
+                                            .size(24.dp)
+                                            .padding(2.dp)
+                                    )
+                                    Spacer(modifier = Modifier.size(width = 8.dp, height = 0.dp))
+                                }
                             }
                             Text(updateBtnText.value)
                         }

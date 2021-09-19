@@ -14,9 +14,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -65,6 +67,7 @@ class LoginActivity : DaggerAppCompatActivity() {
             loginBtnText = remember { mutableStateOf("Login") }
             isLoggingIn = remember { mutableStateOf(false) }
             coroutineScope = rememberCoroutineScope()
+            val focusManager = LocalFocusManager.current
 
             MaterialTheme(
                 colors = lightColors(
@@ -118,6 +121,7 @@ class LoginActivity : DaggerAppCompatActivity() {
                                 end.linkTo(parent.end)
                             },
                         onButtonClicked = {
+                            focusManager.clearFocus()
                             if (username.value.isEmpty() || password.value.isEmpty()) {
                                 Toast.makeText(
                                     this@LoginActivity,
@@ -162,11 +166,11 @@ class LoginActivity : DaggerAppCompatActivity() {
                                         }
                                     } else
                                         loginBtnText.value = "Login"
-                                        Toast.makeText(
-                                            this@LoginActivity,
-                                            "Please try again",
-                                            Toast.LENGTH_LONG
-                                        ).show()
+                                    Toast.makeText(
+                                        this@LoginActivity,
+                                        "Please try again",
+                                        Toast.LENGTH_LONG
+                                    ).show()
                                 })
                             }
                         }
@@ -229,14 +233,22 @@ class LoginActivity : DaggerAppCompatActivity() {
                 .padding(vertical = 2.dp),
             onClick = onButtonClicked
         ) {
-            Row {
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 AnimatedVisibility(visible = isLoggingIn.value) {
-                    CircularProgressIndicator(
-                        color = Color(0xffdefcfa),
-                        modifier = Modifier
-                            .size(24.dp)
-                            .padding(end = 8.dp)
-                    )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        CircularProgressIndicator(
+                            color = Color(0xffdefcfa),
+                            strokeWidth = 3.dp,
+                            modifier = Modifier
+                                .size(24.dp)
+                                .padding(2.dp)
+                        )
+                        Spacer(modifier = Modifier.size(width = 8.dp, height = 0.dp))
+                    }
                 }
                 Text(loginBtnText.value)
             }

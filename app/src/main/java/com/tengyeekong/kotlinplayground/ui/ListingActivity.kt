@@ -27,12 +27,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.platform.LocalTextInputService
-import androidx.compose.ui.platform.SoftwareKeyboardController
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.TextInputService
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModelProvider
@@ -128,6 +124,7 @@ class ListingActivity : DaggerAppCompatActivity() {
                 colors = lightColors(
                     primary = Color(0xff008577),
                     secondary = Color(0xff80CBC4),
+                    background = Color(0xff6a9994),
                 )
             ) {
                 Scaffold(
@@ -212,7 +209,7 @@ class ListingActivity : DaggerAppCompatActivity() {
     ) {
         LazyColumn(
             state = listState,
-            modifier = Modifier.padding(vertical = 4.dp)
+            contentPadding = PaddingValues(top = 4.dp, bottom = 4.dp),
         ) {
             items(lazyListing.itemCount) { index ->
                 lazyListing[index]?.let { list ->
@@ -288,6 +285,7 @@ class ListingActivity : DaggerAppCompatActivity() {
         onButtonClicked: () -> Unit
     ) {
         AlertDialog(
+            backgroundColor = Color(0xff6a9994),
             onDismissRequest = {
                 openDialog.value = false
             },

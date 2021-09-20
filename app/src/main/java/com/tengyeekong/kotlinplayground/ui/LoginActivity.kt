@@ -7,6 +7,7 @@ import androidx.activity.compose.setContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
@@ -73,17 +74,21 @@ class LoginActivity : DaggerAppCompatActivity() {
                 colors = lightColors(
                     primary = Color(0xff008577),
                     secondary = Color(0xff80CBC4),
+                    background = Color(0xff6a9994),
                 )
             ) {
                 ConstraintLayout(
                     modifier = Modifier
                         .fillMaxSize()
+                        .background(MaterialTheme.colors.background)
                         .padding(horizontal = 40.dp)
                 ) {
-                    val (tfUsername, tfPassword, btnLogin) = createRefs()
+                    val (tfUsername, tfPassword, spacer, btnLogin) = createRefs()
+
                     createVerticalChain(
                         tfUsername,
                         tfPassword,
+                        spacer,
                         btnLogin,
                         chainStyle = ChainStyle.Packed
                     )
@@ -107,15 +112,23 @@ class LoginActivity : DaggerAppCompatActivity() {
                         modifier = Modifier
                             .constrainAs(tfPassword) {
                                 top.linkTo(tfUsername.bottom)
-                                bottom.linkTo(btnLogin.top)
+                                bottom.linkTo(spacer.top)
                                 start.linkTo(parent.start)
                                 end.linkTo(parent.end)
                             }
                     )
+                    Spacer(modifier = Modifier
+                        .size(4.dp)
+                        .constrainAs(spacer) {
+                            top.linkTo(tfPassword.bottom)
+                            bottom.linkTo(btnLogin.top)
+                            start.linkTo(parent.start)
+                            end.linkTo(parent.end)
+                        })
                     LoginButton(
                         modifier = Modifier
                             .constrainAs(btnLogin) {
-                                top.linkTo(tfPassword.bottom)
+                                top.linkTo(spacer.bottom)
                                 bottom.linkTo(parent.bottom)
                                 start.linkTo(parent.start)
                                 end.linkTo(parent.end)
@@ -164,13 +177,14 @@ class LoginActivity : DaggerAppCompatActivity() {
                                                     Toast.LENGTH_LONG
                                                 ).show()
                                         }
-                                    } else
+                                    } else {
                                         loginBtnText.value = "Login"
-                                    Toast.makeText(
-                                        this@LoginActivity,
-                                        "Please try again",
-                                        Toast.LENGTH_LONG
-                                    ).show()
+                                        Toast.makeText(
+                                            this@LoginActivity,
+                                            "Please try again",
+                                            Toast.LENGTH_LONG
+                                        ).show()
+                                    }
                                 })
                             }
                         }

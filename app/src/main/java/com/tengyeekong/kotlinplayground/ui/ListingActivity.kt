@@ -63,6 +63,7 @@ class ListingActivity : DaggerAppCompatActivity() {
     lateinit var prefs: SharedPreferences
 
     private lateinit var focusManager: FocusManager
+    private lateinit var dialogFocusManager: FocusManager
     private lateinit var scaffoldState: ScaffoldState
     private lateinit var refreshState: SwipeRefreshState
     private lateinit var listState: LazyListState
@@ -173,7 +174,7 @@ class ListingActivity : DaggerAppCompatActivity() {
                 if (openDialog.value) {
                     UpdateDialog(
                         onButtonClicked = {
-                            focusManager.clearFocus()
+                            dialogFocusManager.clearFocus()
 
                             if (!isUpdatingItem.value) {
                                 updateBtnText.value = "Updating"
@@ -290,6 +291,8 @@ class ListingActivity : DaggerAppCompatActivity() {
                 openDialog.value = false
             },
             buttons = {
+                dialogFocusManager = LocalFocusManager.current
+
                 Column(
                     modifier = Modifier.padding(12.dp)
                 ) {
